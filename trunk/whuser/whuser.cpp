@@ -10,6 +10,9 @@
 	#define WHUSER_EXPORTS
 #endif
 
+#define DLL_NAME		"Longhorn Limit Hold 'Em Poker Bot"
+#define DLL_VERSION		0x00010001		// Version 0.1.1
+
 #include "whuser.h"
 #include "Global.h"
 #include "PokerEngine.h"

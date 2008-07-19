@@ -213,6 +213,14 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\HandEvaluator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OpponentModel.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PokerEngine.cpp"
 				>
 			</File>
@@ -247,6 +255,14 @@
 			>
 			<File
 				RelativePath=".\Global.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HandEvaluator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OpponentModel.h"
 				>
 			</File>
 			<File
