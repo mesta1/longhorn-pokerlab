@@ -74,7 +74,7 @@ int PokerEngine::updateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 
 	table_context->bets_to_call = (*pget_winholdem_symbol)(mychair,"nbetstocall",iserr);
 	table_context->bets_to_raise = (*pget_winholdem_symbol)(mychair,"nbetstorais",iserr);
-	table_context->current_bet = (*pget_winholdem_symbol)(mychair,"ncurrentbets",iserr);
+	table_context->current_bets = (*pget_winholdem_symbol)(mychair,"ncurrentbets",iserr);
 
 	// TODO: add safety check for numplayers
 	for (int i=0; i < 10; i++)
