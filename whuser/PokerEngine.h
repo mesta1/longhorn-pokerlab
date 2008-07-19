@@ -16,9 +16,12 @@ public:
 
 	// Determine the pre-flop action level
 	int getPreflopAction(void);
+	int getPostflopAction(void);
+	int getAction(void);
 
 private:
-	PreflopEvaluator*	preflop_evaluator;
+	HandEvaluator*		preflop_evaluator;
+	HandEvaluator*		postflop_evaluator;
 	TableContext*		table_context;
 public:
 	// Update all our table context variables (OpenHoldem Version)

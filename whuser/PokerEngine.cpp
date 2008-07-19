@@ -9,7 +9,10 @@
 
 PokerEngine::PokerEngine(void)
 {
+	// Here we can decide which evaluator class will be the default
+	// evaluator.  For now, just use the default ones in development
 	preflop_evaluator = new PreflopEvaluator();
+	postflop_evaluator = new HandEvaluator();
 	table_context = new TableContext();
 
 	// Provide initial seed for our random number generator
@@ -19,10 +22,11 @@ PokerEngine::PokerEngine(void)
 PokerEngine::~PokerEngine(void)
 {
 	if (preflop_evaluator) { delete preflop_evaluator; preflop_evaluator = 0; }
+	if (preflop_evaluator) { delete preflop_evaluator; preflop_evaluator = 0; }
 	if (table_context) { delete table_context; table_context = 0; }
 }
 
-//
+////////////////////////////////////////////////////////////////////////////
 // Determine the pre-flop action level
 //
 int PokerEngine::getPreflopAction()
@@ -46,7 +50,24 @@ int PokerEngine::getPreflopAction()
 		return BETRAISE;
 }
 
+////////////////////////////////////////////////////////////////////////////
+// Determine the  post-flop action level
 //
+int PokerEngine::getPostflopAction()
+{
+	return FOLD;
+}
+
+////////////////////////////////////////////////////////////////////////////
+// This is a placeholder in case we decide to integrate pre-flop and 
+// post-flop playint PokerEngine::getAction()
+//
+int PokerEngine::getAction()
+{
+	return FOLD;
+}
+
+////////////////////////////////////////////////////////////////////////////
 // Update all our table context variables (OpenHoldem Version)
 //
 int PokerEngine::updateTableContext(pfgws_t pget_winholdem_symbol, holdem_state* state)
@@ -91,6 +112,17 @@ int PokerEngine::updateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 		table_context->player[i].current_bet = (*pget_winholdem_symbol)(mychair,str,iserr);
 
 	}
+
+	/////////////////////////////////////////////////////
+	// TODO:  Here we change the evaluator to fit the
+	// current flavor of poker for the given hand.  That
+	// is, if we determine we are now heads up we could
+	// switch to the heads-up analyzer which might have
+	// a Nash-equilibrium optimized solution.
+	//
+	// if (postflop_evaluator) delete postflop_evaluator;
+	// postflop_evaluator = new HeadsUpLimitNashEqEvaluator();
+	// ASSERT (postflop_evaluator);
 
 	//TODO:  DEBUG THIS
 

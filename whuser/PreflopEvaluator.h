@@ -4,8 +4,9 @@
 #define _PREFLOPEVALUATOR_H_
 
 #include "Global.h"
+#include "HandEvaluator.h"
 
-class PreflopEvaluator
+class PreflopEvaluator : public HandEvaluator
 {
 public:
 	PreflopEvaluator(void);
