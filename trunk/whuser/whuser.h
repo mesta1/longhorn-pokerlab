@@ -20,7 +20,6 @@
 typedef double (*process_message_t)(const char* message, const void* param );
 WHUSER_API double process_message( const char* message, const void* param );
 
-double gws( const char* name );
 double process_state(holdem_state* pstate);
 double process_query(const char* pquery);
 

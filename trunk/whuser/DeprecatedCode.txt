@@ -1,0 +1,38 @@
+
+// This is a place where code gets to chill for a while before we
+// decide that it is officially dead.
+
+/*
+	int preflophands_threshold[5]
+	This variable is an array of the minimum preflophands_prwin[] value fo
+	each action below
+*/
+	enum ACTION	{
+		FOLD = 0,
+		MAKE1,		//	call one bet
+		MAKE2,		//	call two bets / raise if unraised
+		MAKE3,		//	call three bets / raise-if-reraised
+		CAP			//	cap
+	};
+
+	double preflophands_threshold[5];
+
+	// Normalize the preflop strength matrix
+	int i = 0;
+	double maxval = 0;
+	for (i=0; i < 169; i++) { 
+		if (preflophands_prwin[i] > maxval)
+			maxval = preflophands_prwin[i];
+	}
+	for (i=0; i < 169; i++) { 
+		preflophands_prwin[i] /= maxval;
+	}
+
+	// Initialize preflop thresholds with default values
+	// TODO: Make more robust
+	preflophands_threshold[FOLD] = 0;
+	preflophands_threshold[MAKE1] = preflophands_prwin[39];
+	preflophands_threshold[MAKE2] = preflophands_prwin[16];  // Raise / call two bets with 
+	preflophands_threshold[MAKE3] = preflophands_prwin[5];  // Re-raise / call three bets with JJ or better
+	preflophands_threshold[CAP] = preflophands_prwin[1];	// Cap with KK or better
+

@@ -266,6 +266,10 @@
 			Name="Notes"
 			>
 			<File
+				RelativePath=".\DeprecatedCode.txt"
+				>
+			</File>
+			<File
 				RelativePath=".\Research.txt"
 				>
 			</File>

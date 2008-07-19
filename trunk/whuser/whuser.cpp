@@ -27,16 +27,6 @@ unsigned char	m_ndx;
 PokerEngine* theEngine;
 pfgws_t m_pget_winholdem_symbol;
 
-double gws( int chair, const char* name, bool& iserr ) {
-   return (*m_pget_winholdem_symbol)(chair,name,iserr);
-}
-
-double gws( const char* name ) {
-   bool iserr;
-   int mychair = (int) gws(0,"userchair",iserr);
-   return gws(mychair,name,iserr);
-}
-
 double process_query( const char* pquery ) {
 	if (pquery==NULL)
 		return 0;
@@ -62,25 +52,33 @@ double process_state( holdem_state* pstate ) {
 	return 0;
 }
 
-/////////////////////////////////////////////////////
-//WINHOLDEM RUNTIME ENTRY POINT
-/////////////////////////////////////////////////////
+/*-------------------------------------------------------------------
+	process_message()
+	OPENHOLDEM RUNTIME ENTRY POINT
+*/
+
 WHUSER_API double process_message (const char* pmessage, const void* param) {
 	if (pmessage==NULL) { return 0; }
 	if (param==NULL) { return 0; }
 
 	// (PMESSAGE) "state"
-	// The poker table framework is calling us to update our table context
+	// The OpenHoldem framework is calling us to update our table context
 	// and run any calculations if necessary
 	if (strcmp(pmessage,"state")==0) { 
 		return process_state( (holdem_state*)param ); 
 	}
 
+	// (PMESSAGE) "query"
+	// The OpenHoldem framework is calling us to ask us a question.
 	if (strcmp(pmessage,"query")==0) { 
 		_cprintf("query: %s\n", (LPCSTR) param);
 		return process_query( (const char*)param ); 
 	}
 
+	// (PMESSAGE) "pfgws"
+	// Called when DLL is first loaded to pass us a pointer to the OpenHoldem
+	// get_winholdem_symbol() function.  We call this function to query
+	// OpenHoldem symbols.
 	if (strcmp(pmessage,"pfgws")==0) {	
 		_cprintf("MESSAGE: pfgws\n");
 		m_pget_winholdem_symbol = (pfgws_t)param;
@@ -97,16 +95,18 @@ WHUSER_API double process_message (const char* pmessage, const void* param) {
 
 	return 0;
 }
-/////////////////////////////////////////////////////
 
-/////////////////////////////////
-//DLLMAIN
-/////////////////////////////////
+
+/*-------------------------------------------------------------------
+	DllMain()
+	This is the WinAPI entrypoint for DLL load/unload
+*/
+
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
     switch (ul_reason_for_call)	{
 		case DLL_PROCESS_ATTACH:
 			AllocConsole();
-			theEngine = new PokerEngine();
+			theEngine = new PokerEngine();		// Initialize our one and only PokerEngine
 			break;
 		case DLL_THREAD_ATTACH:
 			break;
@@ -119,4 +119,3 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserve
     }
     return TRUE;
 }
-/////////////////////////////////
