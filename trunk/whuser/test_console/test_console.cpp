@@ -21,7 +21,7 @@
 int _tmain(int argc, _TCHAR* argv[])
 {
 
-	return testhandlist();
+	OpponentModel();
 
 	return 1;
 }
