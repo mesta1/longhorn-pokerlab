@@ -1,8 +1,5 @@
 #include "PreflopEvaluator.h"
 
-#include <stdio.h>
-#include <string.h>
-
 PreflopEvaluator::PreflopEvaluator(void)
 {
 }
@@ -18,30 +15,6 @@ PreflopEvaluator::~PreflopEvaluator(void)
 	card_list must be formatted as follows:
 	"AA AKs 77 72 72s QQ KQs"
 */
-int PreflopEvaluator::isHandInList(unsigned char c[2], const char* card_list)
-{
-	char strhand[4]; strhand[3] = NULL;
-	char revstrhand[4]; revstrhand[3] = NULL;
-	const char ranktochar[]="xA23456789TJQKA";
-
-	// Convert hand from pokerval format to string
-	strhand[0] = ranktochar[RANK(c[0])];
-	strhand[1] = ranktochar[RANK(c[1])];
-	if (RANK(c[0])==RANK(c[1]))
-		strhand[2]=NULL;
-	else
-		ISSUITED(c[0],c[1]) ? strhand[2]='s' : strhand[2]=' ';
-	
-	// Make mirror image of string in case cards are in reverse order
-	revstrhand[1] = strhand[0];
-	revstrhand[0] = strhand[1];
-	revstrhand[2] = strhand[2];
-
-	if (strstr(card_list, strhand)) return 1; // found card in string list
-	if (strstr(card_list, revstrhand)) return 1; // found card in string list
-		
-	return 0;  // found no match
-}
 
 // Returns a probability triple for the desired preflop action
 ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableContext* context)

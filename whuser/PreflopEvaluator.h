@@ -17,9 +17,6 @@ public:
 
 private:
 
-	// See if a given hand is in a list of hands
-	int isHandInList(unsigned char c[2], const char* card_list);
-
 };
 
 #endif
