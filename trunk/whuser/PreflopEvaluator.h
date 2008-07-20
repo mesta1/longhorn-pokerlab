@@ -5,6 +5,8 @@
 
 #include "Global.h"
 #include "HandEvaluator.h"
+#include "TableInformation.h"
+#include "OpponentModel.h"
 
 class PreflopEvaluator : public HandEvaluator
 {
@@ -13,7 +15,7 @@ public:
 	~PreflopEvaluator(void);
 
 	// Returns a probability triple for the desired preflop action
-	ProbabilityTriple GetPreflopAction(TableContext* context);
+	ProbabilityTriple GetPreflopAction(TableInformation* table);
 
 private:
 
