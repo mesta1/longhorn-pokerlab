@@ -1,5 +1,7 @@
 #pragma once
-#include "handevaluator.h"
+#include "HandEvaluator.h"
+#include "TableInformation.h"
+#include "OpponentModel.h"
 
 class LowLimitPostflopEvaluator :
 	public HandEvaluator
@@ -9,7 +11,7 @@ public:
 	~LowLimitPostflopEvaluator(void);
 
 	// Returns a probability triple for the desired preflop action
-	ProbabilityTriple GetPreflopAction(TableContext* context);
+	ProbabilityTriple GetPreflopAction(TableInformation* table);
 
 
 };

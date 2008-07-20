@@ -1,6 +1,8 @@
 #include "Global.h"
 #include "PokerEngine.h"
 #include "PreflopEvaluator.h"
+#include "LowLimitPostflopEvaluator.h"
+#include "OpponentModel.h"
 
 #include <ctime>
 #include <conio.h>
@@ -12,8 +14,11 @@ PokerEngine::PokerEngine(void)
 	// Here we can decide which evaluator class will be the default
 	// evaluator.  For now, just use the default ones in development
 	preflop_evaluator = new PreflopEvaluator();
-	postflop_evaluator = new HandEvaluator();
-	table_context = new TableContext();
+	postflop_evaluator = new LowLimitPostflopEvaluator();
+	
+	table = new TableInformation();
+
+	for (int i=0; i<10; i++) player[i] = new OpponentModel();
 
 	// Provide initial seed for our random number generator
 	srand((unsigned)time(0));
@@ -22,8 +27,9 @@ PokerEngine::PokerEngine(void)
 PokerEngine::~PokerEngine(void)
 {
 	if (preflop_evaluator) { delete preflop_evaluator; preflop_evaluator = 0; }
-	if (preflop_evaluator) { delete preflop_evaluator; preflop_evaluator = 0; }
-	if (table_context) { delete table_context; table_context = 0; }
+	if (postflop_evaluator) { delete postflop_evaluator; preflop_evaluator = 0; }
+	if (table) { delete table; table = 0; }
+	for (int i=0; i<10; i++) { if (player[i]) { delete player[i]; player[i] = 0; } }
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -35,7 +41,7 @@ int PokerEngine::getPreflopAction()
     double random; 
 
 	// Get our probability triple P(f,c,r) given our current table context
-	ptriple = preflop_evaluator->GetPreflopAction(table_context);
+	ptriple = preflop_evaluator->GetPreflopAction(table);
 
 	// Generate a random number 0.00 - 1.00
 	random = rand()/(RAND_MAX + 1.0); 
@@ -72,45 +78,61 @@ int PokerEngine::getAction()
 //
 int PokerEngine::updateTableContext(pfgws_t pget_winholdem_symbol, holdem_state* state)
 {
+	DEBUG_PRINT("PokerEngine::updateTableContext(pfgws_t* pget_winholdem_symbol, holdem_state* state)");
+
 	bool iserr;
 	char str[16];
-	_cprintf("PokerEngine::updateTableContext(pfgws_t* pget_winholdem_symbol, holdem_state* state)");
-
-	// Get the bot chair number and use that when calling the symbol accessor
-	// NOTE: seems pointless.  May be deprecated in OpenHoldem
-	int mychair = (int) (*pget_winholdem_symbol)(0,"userchair",iserr);
-	_cprintf("PokerEngine::updateTableContext(1)");
+	TableContext new_context;
 	
-	table_context->common_pot = (*pget_winholdem_symbol)(mychair,"potcommon",iserr);
-	table_context->bot_chair = mychair;
-	table_context->dealer_chair = (*pget_winholdem_symbol)(mychair,"dealerchair",iserr);
-	_cprintf("PokerEngine::updateTableContext(2)");
+	/////////////////////////////////////////////////////////////
+	// First, pull all the information on the new table context
+	//
+	int mychair = (int) (*pget_winholdem_symbol)(0,"userchair",iserr);	// Get the bot chair number and use that when calling the symbol accessor
+																		// NOTE: seems pointless.  May be deprecated in OpenHoldem	
+	new_context.common_pot = (*pget_winholdem_symbol)(mychair,"potcommon",iserr);
+	new_context.bot_chair = mychair;
+	new_context.dealer_chair = (*pget_winholdem_symbol)(mychair,"dealerchair",iserr);
 
-	table_context->bot_cards[0] = state->m_cards[0];
-	table_context->bot_cards[1] = state->m_cards[1];
-	_cprintf("card[0] = 0x%08X card[1] = 0x%08X\n", state->m_cards[0], state->m_cards[1], 0xFFFFFFFF);
+	new_context.bot_cards[0] = state->m_cards[0];
+	new_context.bot_cards[1] = state->m_cards[1];
 
+	new_context.betting_round = (*pget_winholdem_symbol)(mychair,"betround",iserr);
 
-	table_context->betting_round = (*pget_winholdem_symbol)(mychair,"betround",iserr);
+	new_context.bets_to_call = (*pget_winholdem_symbol)(mychair,"nbetstocall",iserr);
+	new_context.bets_to_raise = (*pget_winholdem_symbol)(mychair,"nbetstorais",iserr);
+	new_context.current_bets = (*pget_winholdem_symbol)(mychair,"ncurrentbets",iserr);
 
-	table_context->bets_to_call = (*pget_winholdem_symbol)(mychair,"nbetstocall",iserr);
-	table_context->bets_to_raise = (*pget_winholdem_symbol)(mychair,"nbetstorais",iserr);
-	table_context->current_bets = (*pget_winholdem_symbol)(mychair,"ncurrentbets",iserr);
+	PlayerContext player_context[10];
+	for (int i=0; i < 10; i++)		// Iterate through all ten players and pull their information
+	{
 
-	// TODO: add safety check for numplayers
+		memcpy(player_context[i].name, state->m_player[i].m_name, 16);
+
+		player_context[i].cards[0] = state->m_player[i].m_cards[0];
+		player_context[i].cards[1] = state->m_player[i].m_cards[1];
+
+		sprintf_s(str, sizeof(str), "balance%u", (int)i);
+		player_context[i].balance = (*pget_winholdem_symbol)(mychair,str,iserr);
+
+		sprintf_s(str, sizeof(str), "currentbet%u", (int)i);
+		player_context[i].current_bet = (*pget_winholdem_symbol)(mychair,str,iserr);
+
+	}
+
+	/////////////////////////////////////////////////////////////
+	// Determine if anything has changed.  If not, then we can
+	// skip out on the rest because this function might get
+	// called numerous times before a change has happened.
+	// if (HasTableContextChanged(&new_context)) {
+	table->UpdateTableContext(new_context);
+
+	/////////////////////////////////////////////////////////////
+	// Now tell the opponent model about our new player
+	// NOTE: not sure we can determine "check" right now. 
+	// TODO: investigate "check"
 	for (int i=0; i < 10; i++)
 	{
-		memcpy(table_context->player[i].name, state->m_player[i].m_name, 16);
-
-		table_context->player[i].cards[0] = state->m_player[i].m_cards[0];
-		table_context->player[i].cards[1] = state->m_player[i].m_cards[1];
-
-		sprintf_s(str, 16, "balance%u", (int)i);
-		table_context->player[i].balance = (*pget_winholdem_symbol)(mychair,str,iserr);
-
-		sprintf_s(str, 16, "currentbet%u", (int)i);
-		table_context->player[i].current_bet = (*pget_winholdem_symbol)(mychair,str,iserr);
-
+		player[i]->UpdatePlayerContext(player_context[i]);
 	}
 
 	/////////////////////////////////////////////////////

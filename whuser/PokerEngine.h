@@ -3,10 +3,13 @@
 #ifndef _pokerengine_h_
 #define _pokerengine_h_
 
+#include "Global.h"
+#include "PreflopEvaluator.h"
+#include "OpponentModel.h"
+#include "TableInformation.h"
+
 #include <stdlib.h>
 
-#include "PreflopEvaluator.h"
-#include "Global.h"
 
 class PokerEngine
 {
@@ -22,7 +25,10 @@ public:
 private:
 	HandEvaluator*		preflop_evaluator;
 	HandEvaluator*		postflop_evaluator;
-	TableContext*		table_context;
+
+	TableInformation*	table;
+	OpponentModel*		player[10];
+
 public:
 	// Update all our table context variables (OpenHoldem Version)
 	int updateTableContext(pfgws_t, holdem_state*);

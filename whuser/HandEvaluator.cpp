@@ -11,14 +11,14 @@ HandEvaluator::~HandEvaluator(void)
 {
 }
 
-ProbabilityTriple HandEvaluator::GetPreflopAction(TableContext* context)
+ProbabilityTriple HandEvaluator::GetPreflopAction(TableInformation* table)
 {
 	ProbabilityTriple ptriple;
 	SET_PTRIPLE(ptriple, 1, 0, 0);
 	return ptriple;
 }
 
-ProbabilityTriple HandEvaluator::GetPostflopAction(TableContext* context)
+ProbabilityTriple HandEvaluator::GetPostflopAction(TableInformation* table)
 {
 	ProbabilityTriple ptriple;
 	SET_PTRIPLE(ptriple, 1, 0, 0);

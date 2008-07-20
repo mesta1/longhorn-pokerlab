@@ -213,7 +213,15 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\debug.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\HandEvaluator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LowLimitPostflopEvaluator.cpp"
 				>
 			</File>
 			<File
@@ -226,6 +234,10 @@
 			</File>
 			<File
 				RelativePath=".\PreflopEvaluator.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TableInformation.cpp"
 				>
 			</File>
 			<File
@@ -262,6 +274,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\LowLimitPostflopEvaluator.h"
+				>
+			</File>
+			<File
 				RelativePath=".\OpponentModel.h"
 				>
 			</File>
@@ -271,6 +287,10 @@
 			</File>
 			<File
 				RelativePath=".\PreflopEvaluator.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TableInformation.h"
 				>
 			</File>
 			<File
