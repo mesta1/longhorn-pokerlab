@@ -7,8 +7,6 @@
 
 #include <string.h>
 
-void DEBUG_PRINT(char* fmt, ...);
-
 /*-------------------------------------------------------------------
 	OpenHoldem Definitions
 	DO NOT ALTER

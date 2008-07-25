@@ -1,5 +1,6 @@
 #include "Global.h"
 #include "Hand.h"
+#include "Debug.h"
 #include "inlines/eval.h"
 
 Hand::Hand(void)
@@ -44,6 +45,8 @@ int Hand::AddCard(unsigned char card)
 int Hand::Evaluate(void)
 {
     CardMask            eval_cards;
+
+	Debug::log(Debug::DEBUG) << "Hand::Evaluate(void)" << std::endl;
 
 	// Set a poker-eval card mask with the values of all the cards
 	CardMask_RESET(eval_cards);

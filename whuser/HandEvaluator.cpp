@@ -1,6 +1,7 @@
 #include "Global.h"
 #include "HandEvaluator.h"
 #include "Hand.h"
+#include "Debug.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -16,6 +17,8 @@ HandEvaluator::~HandEvaluator(void)
 
 ProbabilityTriple HandEvaluator::GetPreflopAction(TableInformation* table)
 {
+	Debug::log(Debug::TRACE) << "HandEvaluator::GetPreflopAction(TableInformation* table)" << std::endl;
+
 	ProbabilityTriple ptriple;
 	SET_PTRIPLE(ptriple, 1, 0, 0);
 	return ptriple;
@@ -23,6 +26,8 @@ ProbabilityTriple HandEvaluator::GetPreflopAction(TableInformation* table)
 
 ProbabilityTriple HandEvaluator::GetPostflopAction(TableInformation* table)
 {
+	Debug::log(Debug::TRACE) << "HandEvaluator::GetPostflopAction(TableInformation* table)" << std::endl;
+
 	ProbabilityTriple ptriple;
 	SET_PTRIPLE(ptriple, 1, 0, 0);
 	return ptriple;
@@ -75,6 +80,8 @@ double	HandEvaluator::CalculateProbabilityOfWinning(TableInformation* table, Opp
 	double			performance_time;
 
 	TableContext*	table_context;
+
+	Debug::log(Debug::TRACE) << "HandEvaluator::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel* players)" << std::endl;
 
 	int	niterations = 1000;		// for now we'll default our simulation iteration limit at 1000
 	win = tie = lose = 0;		// reset our simulation counters to 0

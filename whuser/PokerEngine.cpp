@@ -1,4 +1,5 @@
 #include "Global.h"
+#include "Debug.h"
 #include "PokerEngine.h"
 #include "PreflopEvaluator.h"
 #include "LowLimitPostflopEvaluator.h"
@@ -78,7 +79,7 @@ int PokerEngine::getAction()
 //
 int PokerEngine::updateTableContext(pfgws_t pget_winholdem_symbol, holdem_state* state)
 {
-	DEBUG_PRINT("PokerEngine::updateTableContext(pfgws_t* pget_winholdem_symbol, holdem_state* state)");
+	Debug::log(Debug::TRACE) << "PokerEngine::updateTableContext(pfgws_t* pget_winholdem_symbol, holdem_state* state)" << std::endl;
 
 	bool iserr;
 	char str[16];

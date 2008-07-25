@@ -1,4 +1,5 @@
 #include "PreflopEvaluator.h"
+#include "Debug.h"
 
 PreflopEvaluator::PreflopEvaluator(void)
 {
@@ -21,6 +22,8 @@ ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
 {
 	unsigned char cards[2];
 	ProbabilityTriple	ptriple;
+
+	Debug::log(Debug::TRACE) << "PreflopEvaluator::GetPreflopAction(TableInformation* table)" << std::endl;
 
 	TableContext* context = table->GetTableContext();
 
