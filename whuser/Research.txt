@@ -66,3 +66,36 @@ double startinghands_unsuited[13][13] =
 //------------------------------------------------------------------------------------------------------
 //	A		K		Q		J		10		9		8		7		6		5		4		3		2};
 };
+
+double CSymbols::FoldEquity(int bitchairlist)
+{
+   int i,nit,loc,hits,found,progress,size;
+   unsigned int opplist;
+   const int full=0x1ff >> (9-(int)sym.nopponentsplaying);
+
+   i=nit=loc=hits=found=progress=opplist=0;
+   size=opponent_table.size();
+
+   //Generate proper chair list
+   //there are no inactive chairs or userchair in list supplied by prwin_thread
+   for(i=0; i<10;i++)
+   {
+      if(!((int)symbols.sym.playersplayingbits & (1<<i))) continue; //inactive chair
+      if(i==sym.userchair) continue; //user chair
+
+      if((bitchairlist>> i) & 1) opplist |= 1 << loc; //not listed
+
+      loc++;
+   }
+
+   //list is inverted for fast comparison
+   opplist=~opplist;
+
+   for(nit=0; nit < size;nit++)
+      //if opponent_table[nit] == NULL, we win everyone (no fold eq there)
+      //if (opponent_table[nit] & opplist) != NULL, there's still someone who wins us outside of given chair list
+      if(opponent_table[nit] && (opponent_table[nit] & opplist)==NULL) hits++;
+
+   return (double)hits/(double)size;
+}
+

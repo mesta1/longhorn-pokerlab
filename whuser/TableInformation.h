@@ -33,7 +33,7 @@ public:
 	TableInformation(void);
 	~TableInformation(void);
 	int UpdateTableContext(TableContext& context);
-	TableContext& GetTableContext();
+	TableContext* GetTableContext(void);
 
 private:
 	TableContext	table_context;
