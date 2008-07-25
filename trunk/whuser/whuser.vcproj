@@ -281,6 +281,10 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
+				RelativePath=".\Debug.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Global.h"
 				>
 			</File>

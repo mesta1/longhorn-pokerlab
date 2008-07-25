@@ -1,5 +1,6 @@
 #include "Global.h"
 #include "OpponentModel.h"
+#include "Debug.h"
 
 #include <conio.h>
 #include <stdio.h>
@@ -79,6 +80,8 @@ void OpponentModel::UpdateHoleCardGraph(void)
 
 int OpponentModel::UpdatePlayerContext(PlayerContext&	player_context)
 {
+	Debug::log(Debug::TRACE) << "OpponentModel::UpdatePlayerContext(PlayerContext&	player_context)" << std::endl;
+
 	// For now, the name must be the same.
 	if (player_context.name != context.name)
 		return 0;

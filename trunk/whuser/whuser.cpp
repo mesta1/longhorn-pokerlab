@@ -16,6 +16,7 @@
 #include "whuser.h"
 #include "Global.h"
 #include "PokerEngine.h"
+#include "Debug.h"
 
 #include <windows.h>
 #include <atlstr.h>
@@ -30,7 +31,9 @@ unsigned char	m_ndx;
 PokerEngine* theEngine;
 pfgws_t m_pget_winholdem_symbol;
 
-double process_query( const char* pquery ) {
+double process_query(const char* pquery)
+{
+	Debug::log(Debug::TRACE) << "::process_state( holdem_state* pstate )" << std::endl;
 	if (pquery==NULL)
 		return 0;
 
@@ -44,7 +47,9 @@ double process_query( const char* pquery ) {
 	return 0;
 }
 
-double process_state( holdem_state* pstate ) {
+double process_state( holdem_state* pstate )
+{
+	Debug::log(Debug::TRACE) << "::process_state( holdem_state* pstate )" << std::endl;
 
 	// Update the DLL with the latest table context
 	if (pstate!=NULL) {	m_holdem_state[ (++m_ndx)&0xff ] = *pstate; }
@@ -60,7 +65,10 @@ double process_state( holdem_state* pstate ) {
 	OPENHOLDEM RUNTIME ENTRY POINT
 */
 
-WHUSER_API double process_message (const char* pmessage, const void* param) {
+WHUSER_API double process_message (const char* pmessage, const void* param)
+{
+	Debug::log(Debug::TRACE) << "::process_message (const char* pmessage, const void* param)" << std::endl;
+
 	if (pmessage==NULL) { return 0; }
 	if (param==NULL) { return 0; }
 
@@ -105,10 +113,15 @@ WHUSER_API double process_message (const char* pmessage, const void* param) {
 	This is the WinAPI entrypoint for DLL load/unload
 */
 
-BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved) {
-    switch (ul_reason_for_call)	{
+BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
+{
+	Debug::log(Debug::TRACE) << "::DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)" << std::endl;
+
+	switch (ul_reason_for_call)	{
 		case DLL_PROCESS_ATTACH:
 			AllocConsole();
+			Debug::log(Debug::INFO) << DLL_NAME << std::endl;
+			Debug::log(Debug::INFO) << "Version:" << DLL_VERSION << std::endl;
 			theEngine = new PokerEngine();		// Initialize our one and only PokerEngine
 			break;
 		case DLL_THREAD_ATTACH:
