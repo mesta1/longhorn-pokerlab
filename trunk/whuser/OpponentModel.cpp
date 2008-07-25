@@ -9,7 +9,7 @@ OpponentModel::OpponentModel(void)
 {
 	// Initialize our probability chart.  For now we begin by assuming that
 	// before cards are dealt the opponent will play every card
-	for (int i=0; i < 52; i++) p_cards[i] = (double) 1.00;
+	//for (int i=0; i < 52; i++) p_cards[i] = (double) 1.00;
 
 	// Each time we initialize our probabiliy chart
 	// we must update the hole card graph
@@ -23,7 +23,7 @@ OpponentModel::~OpponentModel(void)
 
 void OpponentModel::UpdateHoleCardGraph(void)
 {
-	int i, j;
+/*	int i, j;
 	int idx1, idx2;
 	double p;
 
@@ -74,6 +74,7 @@ void OpponentModel::UpdateHoleCardGraph(void)
 			p_holecards[j][i] = p;
 		}
 	}
+	*/
 }
 
 int OpponentModel::UpdatePlayerContext(PlayerContext&	player_context)

@@ -4,6 +4,7 @@
 #define _OPPONENTMODEL_H_
 
 #include "Global.h"
+#include "WeightedHandTable.h"
 
 struct PlayerContext {
 
@@ -27,21 +28,18 @@ public:
 private:
 
 	// p_dealtcards
-	// Array of probabilities that the player would hold any given card.  The array is
+	// Array of probabilities that the player would hold any given two cards.  The array is
 	// in the order (hearts, diamonds, clubs, spades) because that is the order
 	// defined by Global.h
-	// These are not true probabilities (i.e., odds that he actually holds that card
+	// These are not true probabilities (i.e., odds that he actually holds those cards
 	// instead of other cards.
-	// e.g., p_cards[0 - 5...] = [Ah Ad Ac As Kh Kd ...]
-	double p_cards[52];
+	// e.g., p_cards[0 - 5...] = [AhAh AhAd AhAc AhAs AdAc AdAs ...]
+	WeightedHandTable weight_table;
 
 	// p_holecards
-	// Graph of probabilities that the play holds any two unique holecards. This
-	// is defined by P(c1|c2) where:
-	//
-	// P(c1) = P(c1h)+ P(c1d) + P(c1c) + P(c1s)
-	//
-	// This is not useful for calculations, just for graphical display.  Array is
+	// Graph of probabilities that the play holds any two unique holecards. 
+	// This is not useful for calculations, just for graphical display.
+	// Array is:
 	//
 	//		  0  1  2    11 12
 	//		  A  K  Q .. 3  2

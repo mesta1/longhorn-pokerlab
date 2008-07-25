@@ -7,6 +7,7 @@
 
 void DEBUG_PRINT(char* fmt, ...)
 {
+	/*
 	char str[1024] ;
     va_list	ap;
 
@@ -15,4 +16,5 @@ void DEBUG_PRINT(char* fmt, ...)
     _cprintf("%s", str);
 
     va_end(ap);
+	*/
 }

@@ -22,11 +22,11 @@ ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
 	unsigned char cards[2];
 	ProbabilityTriple	ptriple;
 
-	TableContext context = table->GetTableContext();
+	TableContext* context = table->GetTableContext();
 
 	// Capture our hole cards
-	cards[0] = context.bot_cards[0];
-	cards[1] = context.bot_cards[1];
+	cards[0] = context->bot_cards[0];
+	cards[1] = context->bot_cards[1];
 
 	//---------------------------------------------------------
 	// Now we implement our expert system for pre-flop action.
@@ -44,7 +44,7 @@ ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
 	if (isHandInList(cards, "AKs QQ JJ"))
 	{
 		// Raise these premium hands only if less than three bets to call
-		if (context.bets_to_call >= 3) 
+		if (context->bets_to_call >= 3) 
 			{ SET_PTRIPLE(ptriple, 1, 0, 0); return ptriple; }
 		else
 			{ SET_PTRIPLE(ptriple, 0, .1, .9); return ptriple; }
@@ -54,23 +54,23 @@ ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
 	{
 		// Raise these hands if: 
 		if(
-			(context.current_bets == 1) &&		// no raise yet
-			(context.bets_to_call == 1) &&		// one bet to call	
-			(context.bot_bet_position <= 0) &&	// we are opening the betting or second to act
-			(context.num_players_behind <= 2))	// in late position
+			(context->current_bets == 1) &&		// no raise yet
+			(context->bets_to_call == 1) &&		// one bet to call	
+			(context->bot_bet_position <= 0) &&	// we are opening the betting or second to act
+			(context->num_players_behind <= 2))	// in late position
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
 
 		// Limp with these hands:
 		if(
-			(context.current_bets == 1) &&		// no raise yet
-			(context.bets_to_call == 1) &&		// one bet to call	
-			(context.bot_bet_position <= 0) &&	// we are opening the betting or second to act
-			(context.num_players_playing <= 2))// in early position
+			(context->current_bets == 1) &&		// no raise yet
+			(context->bets_to_call == 1) &&		// one bet to call	
+			(context->bot_bet_position <= 0) &&	// we are opening the betting or second to act
+			(context->num_players_playing <= 2))// in early position
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
 
 		if(
-			(context.bets_to_call == 2) &&		// two bets to call
-			(context.num_players_behind <= 2))	// we are in late position
+			(context->bets_to_call == 2) &&		// two bets to call
+			(context->num_players_behind <= 2))	// we are in late position
 		{ SET_PTRIPLE(ptriple, .5, .5, 0); return ptriple; }
 
 		// default action
@@ -81,15 +81,15 @@ ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
 	{
 		// Raise these hands if: 
 		if(
-			(context.current_bets == 1) &&		// no raise yet
-			(context.bets_to_call == 1) &&		// one bet to call	
-			(context.bot_bet_position <= 0) &&	// we are opening the betting or second to act
-			(context.num_players_behind <= 2))	// in late position
+			(context->current_bets == 1) &&		// no raise yet
+			(context->bets_to_call == 1) &&		// one bet to call	
+			(context->bot_bet_position <= 0) &&	// we are opening the betting or second to act
+			(context->num_players_behind <= 2))	// in late position
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
 
 		if(
-			(context.bets_to_call == 1) &&		// one bets to call
-			(context.num_players_behind <= 2))	// we are in late position
+			(context->bets_to_call == 1) &&		// one bets to call
+			(context->num_players_behind <= 2))	// we are in late position
 		{ SET_PTRIPLE(ptriple, 0, .9, 1); return ptriple; }
 
 		// default action
@@ -100,18 +100,18 @@ ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
 	{
 		// Raise these hands if: 
 		if(
-			(context.current_bets == 1))		// no raise yet
+			(context->current_bets == 1))		// no raise yet
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
 
 		// Limp with these hands:
 		if(
-			(context.current_bets == 1))		// no raise yet
+			(context->current_bets == 1))		// no raise yet
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
 
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
 
 		if(
-			(context.bets_to_call == 2))		// two bets to call
+			(context->bets_to_call == 2))		// two bets to call
 		{ SET_PTRIPLE(ptriple, .5, .5, 0); return ptriple; }
 
 		// default action
@@ -122,7 +122,7 @@ ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
 	{
 		// Limp with these hands:
 		if(
-			(context.current_bets == 1))		// no raise yet
+			(context->current_bets == 1))		// no raise yet
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
 
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
@@ -135,7 +135,7 @@ ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
 	{
 		// Limp with these hands:
 		if(
-			(context.current_bets == 1))		// no raise yet
+			(context->current_bets == 1))		// no raise yet
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
 
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
@@ -148,7 +148,7 @@ ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
 	{
 		// Limp with these hands:
 		if(
-			(context.current_bets == 1))		// no raise yet
+			(context->current_bets == 1))		// no raise yet
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
 
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
@@ -161,7 +161,7 @@ ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
 	{
 		// Limp with these hands:
 		if(
-			(context.current_bets == 1))		// no raise yet
+			(context->current_bets == 1))		// no raise yet
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
 
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
@@ -174,7 +174,7 @@ ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
 	{
 		// Limp with these hands:
 		if(
-			(context.current_bets == 1))		// no raise yet
+			(context->current_bets == 1))		// no raise yet
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }
 
 		{ SET_PTRIPLE(ptriple, 0, .2, .8); return ptriple; }

@@ -49,6 +49,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="..\poker-eval\include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;WHUSER_EXPORTS"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -76,9 +77,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="poker-eval.lib"
 				OutputFile=".\Debug/whuser.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\poker-eval\Debug"
+				IgnoreDefaultLibraryNames="msvcrtd.lib"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/whuser.pdb"
 				RandomizedBaseAddress="1"
@@ -145,6 +149,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="..\poker-eval\include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL"
 				StringPooling="true"
 				RuntimeLibrary="0"
@@ -171,9 +176,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="poker-eval.lib"
 				OutputFile="$(OutDir)\$(ProjectName).dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="..\poker-eval\Release"
 				ProgramDatabaseFile=".\Release/whuser.pdb"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -217,6 +224,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Hand.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\HandEvaluator.cpp"
 				>
 			</File>
@@ -238,6 +249,10 @@
 			</File>
 			<File
 				RelativePath=".\TableInformation.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\WeightedHandTable.cpp"
 				>
 			</File>
 			<File
@@ -270,6 +285,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Hand.h"
+				>
+			</File>
+			<File
 				RelativePath=".\HandEvaluator.h"
 				>
 			</File>
@@ -291,6 +310,10 @@
 			</File>
 			<File
 				RelativePath=".\TableInformation.h"
+				>
+			</File>
+			<File
+				RelativePath=".\WeightedHandTable.h"
 				>
 			</File>
 			<File

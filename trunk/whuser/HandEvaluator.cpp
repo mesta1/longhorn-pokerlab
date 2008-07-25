@@ -1,4 +1,6 @@
+#include "Global.h"
 #include "HandEvaluator.h"
+#include "Hand.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -48,4 +50,101 @@ int HandEvaluator::isHandInList(unsigned char c[2], const char* card_list)
 	if (strstr(card_list, revstrhand)) return 1; // found card in string list
 		
 	return 0;  // found no match
+}
+
+// NOTE:  When developing this function make an effort to keep it
+// thread-safe.  For more info read:
+// http://publib.boulder.ibm.com/infocenter/systems/index.jsp?topic=/com.ibm.aix.genprogc/doc/genprogc/writing_reentrant_thread_safe_code.htm
+//
+// NOTE: Player limits are hardcoded to 10
+//
+double	HandEvaluator::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel* players)
+{
+	unsigned char	used_card_mask[52];
+	unsigned char	player_cards[10][2];
+	unsigned char	common_cards[5];
+	double			p_win, p_tie, p_lose;
+	int				win, tie, lose;
+	int				bot_hand_value, opp_hand_value[10];
+	int				i,j;
+		
+
+	TableContext*	table_context;
+
+	int	niterations = 1000;		// for now we'll default our simulation iteration limit at 1000
+	win = tie = lose = 0;		// reset our simulation counters to 0
+
+	// Retrieve our current table context
+	table_context = table->GetTableContext();
+
+	// Begin the Monte Carlo simulation
+	for (i=0; i < niterations; i++)
+	{
+		// Deal random cards to each player
+		for (j=0; j < 10; j++) { DealCardsToOpponent(&players[j], player_cards[j], used_card_mask); }
+
+		// Roll out random common cards
+		if (table_context->betting_round < FLOP) DealFlop(common_cards, used_card_mask);
+		if (table_context->betting_round < TURN) DealTurn(common_cards, used_card_mask);
+		if (table_context->betting_round < RIVER) DealRiver(common_cards, used_card_mask);
+	
+		// Determine what our best hand is
+		bot_hand_value = EvaluateBestSevenCardHand(table_context->bot_cards, common_cards);
+
+		for (j=0; j < 10; j++) {
+
+			opp_hand_value[j] = EvaluateBestSevenCardHand(player_cards[j], common_cards);
+			if (opp_hand_value[j] > bot_hand_value)
+			{
+				lose++;
+			}
+			else if (opp_hand_value[j] == bot_hand_value)
+			{
+				tie++;
+			}
+			else
+			{
+				win++;
+			}
+		}	
+
+		p_win = win / niterations;
+		p_tie = tie / niterations;
+		p_lose = lose / niterations;
+	}	
+
+	return 0.0;		// we should not get here
+}
+
+inline void HandEvaluator::DealCardsToOpponent(OpponentModel* opponent, unsigned char* player_cards, unsigned char* card_mask)
+{
+}
+
+inline void HandEvaluator::DealFlop(unsigned char* common_cards, unsigned char* card_mask)
+{
+}
+inline void HandEvaluator::DealTurn(unsigned char* common_cards, unsigned char* card_mask)
+{
+}
+inline void HandEvaluator::DealRiver(unsigned char* common_cards, unsigned char* card_mask)
+{
+}
+inline int HandEvaluator::EvaluateBestSevenCardHand(unsigned char* player_cards, unsigned char* common_cards)
+{
+	Hand	hand;
+	int		peval_value;
+
+	hand.AddCard(player_cards[0]);
+	hand.AddCard(player_cards[1]);
+
+	hand.AddCard(common_cards[0]);
+	hand.AddCard(common_cards[1]);
+	hand.AddCard(common_cards[2]);
+	hand.AddCard(common_cards[3]);
+	hand.AddCard(common_cards[4]);
+
+	peval_value = hand.Evaluate();
+
+	return peval_value;
+
 }

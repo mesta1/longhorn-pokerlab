@@ -5,6 +5,8 @@
 
 #include "OpponentModel.h"
 
+#include <string.h>
+
 void DEBUG_PRINT(char* fmt, ...);
 
 /*-------------------------------------------------------------------
@@ -55,24 +57,29 @@ void DEBUG_PRINT(char* fmt, ...);
 	These are unique to the bot engine and may be architected
 	at will.
 */
-	struct ProbabilityTriple {
-		double			fold;		//probability of folding
-		double			checkcall;	//probability of check / call
-		double			betraise;	//probability of bet / raise
-	};
 
-	enum ACTION {
-		FOLD = 0,
-		CHECKCALL,
-		BETRAISE
-	};
-	enum BETTING_ROUND {
-		PREFLOP = 0,
-		FLOP,
-		TURN,
-		RIVER
-	};
+struct ProbabilityTriple {
+	double			fold;		//probability of folding
+	double			checkcall;	//probability of check / call
+	double			betraise;	//probability of bet / raise
+};
 
+enum ACTION {
+	FOLD = 0,
+	CHECKCALL,
+	BETRAISE
+};
+enum BETTING_ROUND {
+	PREFLOP = 0,
+	FLOP,
+	TURN,
+	RIVER
+};
+
+// Use this definition for the maximum number of players.  We
+// may want to make this configurable.  Note that this is not
+// the same as the maximum players at a table (which may be 9)
+#define	MAX_PLAYERS		10;
 
 #define SET_PTRIPLE(a,b,c,d) {a.fold = b; a.checkcall = c; a.betraise = d;}
 
@@ -100,10 +107,14 @@ void DEBUG_PRINT(char* fmt, ...);
 	1 	Club
 ------------------------------------------------------------*/
 
-
 // CARD MACROS
+
 #define RANK(c)			((c>>4)&0x0f)
 #define SUIT(c)			((c>>0)&0x0f)
+
+#define SETRANK(c, r)	((c&0xf0) | (r<<4))
+#define SETSUIT(c, s)	((c&0x0f) | s)
+#define MAKECARD(r,s)	((r<<4) | s)
 #define ISCARDBACK(c)	(c==0xff)
 #define ISUNKNOWN(c)	(c==0)
 #define ISSUITED(c,d)	(SUIT(c)==SUIT(d))
@@ -112,9 +123,26 @@ void DEBUG_PRINT(char* fmt, ...);
 
 #define N_CARDS      52
 
-#define HEARTS   0
-#define DIAMONDS 1
-#define CLUBS    2
-#define SPADES   3
+#define CLUBS		1
+#define DIAMONDS	2
+#define HEARTS		3
+#define SPADES		4
+
+#define		CARD_BACK		0xff
+#define		CARD_NOCARD		0x00
+
+const char	_stoc[] = "xx23456789TJQKA";
+const char	_rtoc[] = "xcdhs";
+
+inline unsigned char STRINGTOCARD(const char* str)
+{
+	int i, rank, suit;
+
+	for (i=0; i<sizeof(_stoc); i++) if (_stoc[i]==str[0]) rank=i;
+	for (i=0; i<sizeof(_rtoc); i++) if (_rtoc[i]==str[1]) suit=i;
+
+	return MAKECARD(rank, suit);
+}
+
 
 #endif

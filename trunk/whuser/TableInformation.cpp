@@ -27,7 +27,7 @@ int TableInformation::UpdateTableContext(TableContext& context)
 	return 1;	
 }
 
-TableContext& TableInformation::GetTableContext()
+TableContext* TableInformation::GetTableContext(void)
 {
-	return table_context;
+	return &table_context;
 }
