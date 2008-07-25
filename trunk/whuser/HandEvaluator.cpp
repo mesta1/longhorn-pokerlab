@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <windows.h>
 
 HandEvaluator::HandEvaluator(void)
 {
@@ -61,22 +62,32 @@ int HandEvaluator::isHandInList(unsigned char c[2], const char* card_list)
 double	HandEvaluator::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel* players)
 {
 	unsigned char	used_card_mask[52];
+
 	unsigned char	player_cards[10][2];
 	unsigned char	common_cards[5];
+
 	double			p_win, p_tie, p_lose;
 	int				win, tie, lose;
 	int				bot_hand_value, opp_hand_value[10];
 	int				i,j;
-		
+
+	LARGE_INTEGER	counter_start, counter_end, frequency;
+	double			performance_time;
 
 	TableContext*	table_context;
 
 	int	niterations = 1000;		// for now we'll default our simulation iteration limit at 1000
 	win = tie = lose = 0;		// reset our simulation counters to 0
 
+	// Record our starting time to track performance
+	QueryPerformanceCounter(&counter_start);
+
 	// Retrieve our current table context
 	table_context = table->GetTableContext();
+	for (i=0; i < 5; i++) common_cards[i] = table_context->common_cards[i];
 
+	// MONTE CARLO SIMULATION
+	// POKER EVALUATOR
 	// Begin the Monte Carlo simulation
 	for (i=0; i < niterations; i++)
 	{
@@ -113,7 +124,13 @@ double	HandEvaluator::CalculateProbabilityOfWinning(TableInformation* table, Opp
 		p_lose = lose / niterations;
 	}	
 
-	return 0.0;		// we should not get here
+	// Record our ending timer count and calculate our performance_time
+	// in seconds for running the simulation.
+	QueryPerformanceCounter(&counter_end);
+	QueryPerformanceFrequency(&frequency);
+	performance_time = (double) (counter_end.LowPart - counter_start.LowPart) / (double) frequency.LowPart;
+
+	return p_win;
 }
 
 inline void HandEvaluator::DealCardsToOpponent(OpponentModel* opponent, unsigned char* player_cards, unsigned char* card_mask)
