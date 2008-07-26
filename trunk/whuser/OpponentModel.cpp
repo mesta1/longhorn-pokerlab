@@ -80,7 +80,7 @@ void OpponentModel::UpdateHoleCardGraph(void)
 
 int OpponentModel::UpdatePlayerContext(PlayerContext&	player_context)
 {
-	Debug::log(Debug::TRACE) << "OpponentModel::UpdatePlayerContext(PlayerContext&	player_context)" << std::endl;
+	Debug::log(LTRACE) << "OpponentModel::UpdatePlayerContext(PlayerContext&	player_context)" << std::endl;
 
 	// For now, the name must be the same.
 	if (player_context.name != context.name)

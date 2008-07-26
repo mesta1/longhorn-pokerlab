@@ -23,7 +23,7 @@ ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
 	unsigned char cards[2];
 	ProbabilityTriple	ptriple;
 
-	Debug::log(Debug::TRACE) << "PreflopEvaluator::GetPreflopAction(TableInformation* table)" << std::endl;
+	Debug::log(LTRACE) << "PreflopEvaluator::GetPreflopAction(TableInformation* table)" << std::endl;
 
 	TableContext* context = table->GetTableContext();
 
