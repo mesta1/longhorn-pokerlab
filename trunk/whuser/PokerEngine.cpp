@@ -1,8 +1,8 @@
 #include "Global.h"
 #include "Debug.h"
 #include "PokerEngine.h"
-#include "PreflopEvaluator.h"
-#include "LowLimitPostflopEvaluator.h"
+#include "LowLimitPreflopAnalyzer.h"
+#include "LowLimitPostflopAnalyzer.h"
 #include "OpponentModel.h"
 
 #include <ctime>
@@ -12,10 +12,10 @@
 
 PokerEngine::PokerEngine(void)
 {
-	// Here we can decide which evaluator class will be the default
+	// Here we can decide which analyzer class will be the default
 	// evaluator.  For now, just use the default ones in development
-	preflop_evaluator = new PreflopEvaluator();
-	postflop_evaluator = new LowLimitPostflopEvaluator();
+	preflop_analyzer = new LowLimitPreflopAnalyzer();
+	postflop_analyzer = new LowLimitPostflopAnalyzer();
 	
 	table = new TableInformation();
 
@@ -27,8 +27,8 @@ PokerEngine::PokerEngine(void)
 
 PokerEngine::~PokerEngine(void)
 {
-	if (preflop_evaluator) { delete preflop_evaluator; preflop_evaluator = 0; }
-	if (postflop_evaluator) { delete postflop_evaluator; preflop_evaluator = 0; }
+	if (preflop_analyzer) { delete preflop_analyzer; preflop_analyzer = 0; }
+	if (postflop_analyzer) { delete postflop_analyzer; postflop_analyzer = 0; }
 	if (table) { delete table; table = 0; }
 	for (int i=0; i<10; i++) { if (player[i]) { delete player[i]; player[i] = 0; } }
 }
@@ -42,7 +42,7 @@ int PokerEngine::getPreflopAction()
     double random; 
 
 	// Get our probability triple P(f,c,r) given our current table context
-	ptriple = preflop_evaluator->GetPreflopAction(table);
+	ptriple = preflop_analyzer->GetPreflopAction(table);
 
 	// Generate a random number 0.00 - 1.00
 	random = rand()/(RAND_MAX + 1.0); 
@@ -124,30 +124,31 @@ int PokerEngine::updateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 	// Determine if anything has changed.  If not, then we can
 	// skip out on the rest because this function might get
 	// called numerous times before a change has happened.
-	// if (HasTableContextChanged(&new_context)) {
-	table->UpdateTableContext(new_context);
-
-	/////////////////////////////////////////////////////////////
-	// Now tell the opponent model about our new player
 	// NOTE: not sure we can determine "check" right now. 
 	// TODO: investigate "check"
-	for (int i=0; i < 10; i++)
-	{
-		player[i]->UpdatePlayerContext(player_context[i]);
-	}
+	
+	//if (HasTableContextChanged(&new_context))
+	//{
+		// Store the table context 
+		table->UpdateTableContext(new_context);
 
-	/////////////////////////////////////////////////////
-	// TODO:  Here we change the evaluator to fit the
-	// current flavor of poker for the given hand.  That
-	// is, if we determine we are now heads up we could
-	// switch to the heads-up analyzer which might have
-	// a Nash-equilibrium optimized solution.
-	//
-	// if (postflop_evaluator) delete postflop_evaluator;
-	// postflop_evaluator = new HeadsUpLimitNashEqEvaluator();
-	// ASSERT (postflop_evaluator);
+		// Now tell the opponent model about our new player
+		for (int i=0; i < 10; i++)
+		{
+			player[i]->UpdatePlayerContext(player_context[i]);
+		}
 
-	//TODO:  DEBUG THIS
+		/////////////////////////////////////////////////////
+		// TODO:  Here we change the analyzer to fit the
+		// current flavor of poker for the given hand.  That
+		// is, if we determine we are now heads up we could
+		// switch to the heads-up analyzer which might have
+		// a Nash-equilibrium optimized solution.
+		//
+		// postflop_analyzer = p_HeadsUpLimitNashEqAnalyzer;
+
+		//postflop_analyzer->
+	//}
 
 	return 0;
 }

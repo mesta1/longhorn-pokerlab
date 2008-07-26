@@ -1,17 +1,17 @@
 #pragma once
 
-#ifndef _HANDEVALUATOR_H_
-#define _HANDEVALUATOR_H_
+#ifndef _HANDANALZYER_H_
+#define _HANDANALYZER_H_
 
 #include "Global.h"
 #include "TableInformation.h"
 #include "OpponentModel.h"
 
-class HandEvaluator
+class HandAnalyzer
 {
 public:
-	HandEvaluator(void);
-	~HandEvaluator(void);
+	HandAnalyzer(void);
+	~HandAnalyzer(void);
 
 	ProbabilityTriple GetPreflopAction(TableInformation* table);
 	ProbabilityTriple GetPostflopAction(TableInformation* table);
@@ -27,7 +27,7 @@ private:
 	inline void DealTurn(unsigned char*, unsigned char*);
 	inline void DealRiver(unsigned char*, unsigned char*);
 
-	inline int HandEvaluator::EvaluateBestSevenCardHand(unsigned char*, unsigned char*);
+	inline int EvaluateBestSevenCardHand(unsigned char*, unsigned char*);
 };
 
 #endif

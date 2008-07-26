@@ -4,7 +4,7 @@
 #define _pokerengine_h_
 
 #include "Global.h"
-#include "PreflopEvaluator.h"
+#include "LowLimitPreflopAnalyzer.h"
 #include "OpponentModel.h"
 #include "TableInformation.h"
 
@@ -23,8 +23,8 @@ public:
 	int getAction(void);
 
 private:
-	HandEvaluator*		preflop_evaluator;
-	HandEvaluator*		postflop_evaluator;
+	HandAnalyzer*		preflop_analyzer;
+	HandAnalyzer*		postflop_analyzer;
 
 	TableInformation*	table;
 	OpponentModel*		player[10];

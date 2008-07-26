@@ -1,11 +1,11 @@
-#include "PreflopEvaluator.h"
+#include "LowLimitPreflopAnalyzer.h"
 #include "Debug.h"
 
-PreflopEvaluator::PreflopEvaluator(void)
+LowLimitPreflopAnalyzer::LowLimitPreflopAnalyzer(void)
 {
 }
 
-PreflopEvaluator::~PreflopEvaluator(void)
+LowLimitPreflopAnalyzer::~LowLimitPreflopAnalyzer(void)
 {
 }
 
@@ -18,12 +18,12 @@ PreflopEvaluator::~PreflopEvaluator(void)
 */
 
 // Returns a probability triple for the desired preflop action
-ProbabilityTriple PreflopEvaluator::GetPreflopAction(TableInformation* table)
+ProbabilityTriple LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* table)
 {
 	unsigned char cards[2];
 	ProbabilityTriple	ptriple;
 
-	Debug::log(LTRACE) << "PreflopEvaluator::GetPreflopAction(TableInformation* table)" << std::endl;
+	Debug::log(LTRACE) << "LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* table)" << std::endl;
 
 	TableContext* context = table->GetTableContext();
 
