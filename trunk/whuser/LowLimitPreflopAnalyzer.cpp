@@ -25,7 +25,7 @@ ProbabilityTriple LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* ta
 
 	Debug::log(LTRACE) << "LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* table)" << std::endl;
 
-	TableContext* context = table->GetTableContext();
+	TableContext* context = table->GetCurrentTableContext();
 
 	// Capture our hole cards
 	cards[0] = context->bot_cards[0];

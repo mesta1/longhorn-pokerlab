@@ -31,7 +31,7 @@ private:
 
 public:
 	// Update all our table context variables (OpenHoldem Version)
-	int updateTableContext(pfgws_t, holdem_state*);
+	int UpdateTableContext(pfgws_t, holdem_state*);
 };
 
 

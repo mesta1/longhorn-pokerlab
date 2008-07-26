@@ -77,7 +77,7 @@ int PokerEngine::getAction()
 ////////////////////////////////////////////////////////////////////////////
 // Update all our table context variables (OpenHoldem Version)
 //
-int PokerEngine::updateTableContext(pfgws_t pget_winholdem_symbol, holdem_state* state)
+int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state* state)
 {
 	Debug::log(LTRACE) << "PokerEngine::updateTableContext(pfgws_t* pget_winholdem_symbol, holdem_state* state)" << std::endl;
 
@@ -89,8 +89,11 @@ int PokerEngine::updateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 	// First, pull all the information on the new table context
 	//
 	int mychair = (int) (*pget_winholdem_symbol)(0,"userchair",iserr);	// Get the bot chair number and use that when calling the symbol accessor
-																		// NOTE: seems pointless.  May be deprecated in OpenHoldem	
+																		// NOTE: seems pointless.  May be deprecated in OpenHoldem?	
+
 	new_context.common_pot = (*pget_winholdem_symbol)(mychair,"potcommon",iserr);
+	new_context.total_pot = (*pget_winholdem_symbol)(mychair,"pot",iserr);
+
 	new_context.bot_chair = mychair;
 	new_context.dealer_chair = (*pget_winholdem_symbol)(mychair,"dealerchair",iserr);
 
@@ -127,15 +130,19 @@ int PokerEngine::updateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 	// NOTE: not sure we can determine "check" right now. 
 	// TODO: investigate "check"
 	
-	//if (HasTableContextChanged(&new_context))
-	//{
-		// Store the table context 
+	if (table->HasTableContextChanged(new_context))
+	{
+		// Store the table context
 		table->UpdateTableContext(new_context);
 
 		// Now tell the opponent model about our new player
+		// information
 		for (int i=0; i < 10; i++)
 		{
-			player[i]->UpdatePlayerContext(player_context[i]);
+			// Update the opponent model if the player context has
+			// changed.
+			if (player[i]->HasPlayerContextChanged(player_context[i]))
+				player[i]->UpdatePlayerContext(player_context[i]);
 		}
 
 		/////////////////////////////////////////////////////
@@ -144,11 +151,11 @@ int PokerEngine::updateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 		// is, if we determine we are now heads up we could
 		// switch to the heads-up analyzer which might have
 		// a Nash-equilibrium optimized solution.
-		//
-		// postflop_analyzer = p_HeadsUpLimitNashEqAnalyzer;
-
-		//postflop_analyzer->
-	//}
+		// 
+		// if (AreWeHeadsUp()) postflop_analyzer = p_HeadsUpLimitNashEqAnalyzer;
+		
+	}
 
 	return 0;
 }
+
