@@ -305,6 +305,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\OpenHoldem.h"
+				>
+			</File>
+			<File
 				RelativePath=".\OpponentModel.h"
 				>
 			</File>

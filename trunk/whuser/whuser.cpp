@@ -14,6 +14,7 @@
 #define DLL_VERSION		0x00010001		// Version 0.1.1
 
 #include "whuser.h"
+#include "OpenHoldem.h"
 #include "Global.h"
 #include "PokerEngine.h"
 #include "Debug.h"
@@ -26,12 +27,8 @@
 
 
 ////////////////////////////////////
-//Debug console globals
-//We should move this to Debug class
-std::streambuf* old_cout;
-
+//  The one and only PokerEngine 
 PokerEngine* theEngine;
-pfgws_t m_pget_winholdem_symbol;
 
 double process_query(const char* pquery)
 {
