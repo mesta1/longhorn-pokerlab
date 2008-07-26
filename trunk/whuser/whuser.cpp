@@ -78,7 +78,7 @@ WHUSER_API double process_message (const char* pmessage, const void* param)
 	// (PMESSAGE) "query"
 	// The OpenHoldem framework is calling us to ask us a question.
 	if (strcmp(pmessage,"query")==0) { 
-		_cprintf("query: %s\n", (LPCSTR) param);
+		Debug::log(LDEBUG) << "query: " << (LPCSTR) param << std::endl;
 		return process_query( (const char*)param ); 
 	}
 

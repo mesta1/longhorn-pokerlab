@@ -129,17 +129,25 @@ enum BETTING_ROUND {
 #define		CARD_BACK		0xff
 #define		CARD_NOCARD		0x00
 
-const char	_stoc[] = "xx23456789TJQKA";
-const char	_rtoc[] = "xcdhs";
+static const char	_rtoc[17] = "[X23456789TJQKA[";
+static const char	_stoc[17] = "]cdhsxxxxxxxxxx]";
 
-inline unsigned char STRINGTOCARD(const char* str)
+inline unsigned char STRTOCARD(const char* str)
 {
 	int i, rank, suit;
 
-	for (i=0; i<sizeof(_stoc); i++) if (_stoc[i]==str[0]) rank=i;
-	for (i=0; i<sizeof(_rtoc); i++) if (_rtoc[i]==str[1]) suit=i;
+	for (i=0; i<sizeof(_rtoc); i++) if (_stoc[i]==str[0]) rank=i;
+	for (i=0; i<sizeof(_stoc); i++) if (_rtoc[i]==str[1]) suit=i;
 
 	return MAKECARD(rank, suit);
+}
+
+inline void CARDTOSTR(char* buf, unsigned char card)
+{
+	buf[0] = _rtoc[RANK(card)];
+	buf[1] = _stoc[SUIT(card)];
+
+	return;
 }
 
 
