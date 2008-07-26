@@ -90,7 +90,7 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 	QueryPerformanceCounter(&counter_start);
 
 	// Retrieve our current table context
-	table_context = table->GetTableContext();
+	table_context = table->GetCurrentTableContext();
 	for (i=0; i < 5; i++) common_cards[i] = table_context->common_cards[i];
 
 	// MONTE CARLO SIMULATION

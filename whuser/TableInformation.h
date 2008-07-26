@@ -4,6 +4,7 @@ struct TableContext {
 
 	unsigned char   common_cards[5];	//common cards
 	double			common_pot;			//common pot (excluding current bets)
+	double			total_pot;			//total pot (including common pot and current bets)
 
 	double			bot_chair;			//0-9
 	double			dealer_chair;		//0-9
@@ -33,8 +34,11 @@ public:
 	TableInformation(void);
 	~TableInformation(void);
 	int UpdateTableContext(TableContext& context);
-	TableContext* GetTableContext(void);
+	TableContext* GetCurrentTableContext(void);
+	int HasTableContextChanged(TableContext& context);
 
 private:
-	TableContext	table_context;
+	TableContext	table_context[1024];	// array of TableContext structures to keep history during the hand
+											// we can create functions to examine the history of the hand
+	int				index;
 };

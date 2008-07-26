@@ -26,12 +26,6 @@
 
 
 ////////////////////////////////////
-//consecutive states
-holdem_state	m_holdem_state[256];
-unsigned char	m_ndx;
-////////////////////////////////////
-
-////////////////////////////////////
 //Debug console globals
 //We should move this to Debug class
 std::streambuf* old_cout;
@@ -59,11 +53,8 @@ double process_state( holdem_state* pstate )
 {
 	Debug::log(LTRACE) << "::process_state( holdem_state* pstate )" << std::endl;
 
-	// Update the DLL with the latest table context
-	if (pstate!=NULL) {	m_holdem_state[ (++m_ndx)&0xff ] = *pstate; }
-
 	// Update our PokerEngine with the latest table context
-	theEngine->updateTableContext(m_pget_winholdem_symbol, pstate);
+	theEngine->UpdateTableContext(m_pget_winholdem_symbol, pstate);
 
 	return 0;
 }

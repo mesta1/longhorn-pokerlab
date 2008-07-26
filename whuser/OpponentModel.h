@@ -24,6 +24,7 @@ public:
 	~OpponentModel(void);
 
 	int UpdatePlayerContext(PlayerContext& player_context);
+	int HasPlayerContextChanged(PlayerContext& player_context);
 
 private:
 
