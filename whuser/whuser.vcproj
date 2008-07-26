@@ -228,11 +228,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\HandEvaluator.cpp"
+				RelativePath=".\HandAnalyzer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\LowLimitPostflopEvaluator.cpp"
+				RelativePath=".\LowLimitPostflopAnalyzer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\LowLimitPreflopAnalyzer.cpp"
 				>
 			</File>
 			<File
@@ -241,10 +245,6 @@
 			</File>
 			<File
 				RelativePath=".\PokerEngine.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\PreflopEvaluator.cpp"
 				>
 			</File>
 			<File
@@ -293,11 +293,15 @@
 				>
 			</File>
 			<File
-				RelativePath=".\HandEvaluator.h"
+				RelativePath=".\HandAnalyzer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\LowLimitPostflopEvaluator.h"
+				RelativePath=".\LowLimitPostflopAnalyzer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\LowLimitPreflopAnalyzer.h"
 				>
 			</File>
 			<File
@@ -306,10 +310,6 @@
 			</File>
 			<File
 				RelativePath=".\PokerEngine.h"
-				>
-			</File>
-			<File
-				RelativePath=".\PreflopEvaluator.h"
 				>
 			</File>
 			<File

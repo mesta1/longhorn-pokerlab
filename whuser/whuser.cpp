@@ -141,6 +141,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserve
 			Debug::log(LINFO) << "Beginning new DLL instance" << std::endl; 
 			Debug::LogDateAndTime(LINFO); Debug::log(LINFO) << std::endl;
 			Debug::log(LINFO) << "------------------------------------------------------" << std::endl;
+
 			// Initialize our one and only PokerEngine (NOTE: make this a singleton)
 			theEngine = new PokerEngine();
 			break;

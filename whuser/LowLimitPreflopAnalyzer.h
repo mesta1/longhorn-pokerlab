@@ -1,18 +1,18 @@
 #pragma once
 
-#ifndef _PREFLOPEVALUATOR_H_
-#define _PREFLOPEVALUATOR_H_
+#ifndef _LOWLIMITPREFLOPANALZYER_H_
+#define _LOWLIMITPREFLOPANALYZER_H_
 
 #include "Global.h"
-#include "HandEvaluator.h"
+#include "HandAnalyzer.h"
 #include "TableInformation.h"
 #include "OpponentModel.h"
 
-class PreflopEvaluator : public HandEvaluator
+class LowLimitPreflopAnalyzer : public HandAnalyzer
 {
 public:
-	PreflopEvaluator(void);
-	~PreflopEvaluator(void);
+	LowLimitPreflopAnalyzer(void);
+	~LowLimitPreflopAnalyzer(void);
 
 	// Returns a probability triple for the desired preflop action
 	ProbabilityTriple GetPreflopAction(TableInformation* table);

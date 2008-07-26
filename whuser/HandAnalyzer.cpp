@@ -1,5 +1,5 @@
 #include "Global.h"
-#include "HandEvaluator.h"
+#include "HandAnalyzer.h"
 #include "Hand.h"
 #include "Debug.h"
 
@@ -7,33 +7,33 @@
 #include <string.h>
 #include <windows.h>
 
-HandEvaluator::HandEvaluator(void)
+HandAnalyzer::HandAnalyzer(void)
 {
 }
 
-HandEvaluator::~HandEvaluator(void)
+HandAnalyzer::~HandAnalyzer(void)
 {
 }
 
-ProbabilityTriple HandEvaluator::GetPreflopAction(TableInformation* table)
+ProbabilityTriple HandAnalyzer::GetPreflopAction(TableInformation* table)
 {
-	Debug::log(LTRACE) << "HandEvaluator::GetPreflopAction(TableInformation* table)" << std::endl;
+	Debug::log(LTRACE) << "HandAnalyzer::GetPreflopAction(TableInformation* table)" << std::endl;
 
 	ProbabilityTriple ptriple;
 	SET_PTRIPLE(ptriple, 1, 0, 0);
 	return ptriple;
 }
 
-ProbabilityTriple HandEvaluator::GetPostflopAction(TableInformation* table)
+ProbabilityTriple HandAnalyzer::GetPostflopAction(TableInformation* table)
 {
-	Debug::log(LTRACE) << "HandEvaluator::GetPostflopAction(TableInformation* table)" << std::endl;
+	Debug::log(LTRACE) << "HandAnalyzer::GetPostflopAction(TableInformation* table)" << std::endl;
 
 	ProbabilityTriple ptriple;
 	SET_PTRIPLE(ptriple, 1, 0, 0);
 	return ptriple;
 }
 
-int HandEvaluator::isHandInList(unsigned char c[2], const char* card_list)
+int HandAnalyzer::isHandInList(unsigned char c[2], const char* card_list)
 {
 	char strhand[4]; strhand[3] = NULL;
 	char revstrhand[4]; revstrhand[3] = NULL;
@@ -64,7 +64,7 @@ int HandEvaluator::isHandInList(unsigned char c[2], const char* card_list)
 //
 // NOTE: Player limits are hardcoded to 10
 //
-double	HandEvaluator::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel* players)
+double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel* players)
 {
 	unsigned char	used_card_mask[52];
 
@@ -81,7 +81,7 @@ double	HandEvaluator::CalculateProbabilityOfWinning(TableInformation* table, Opp
 
 	TableContext*	table_context;
 
-	Debug::log(LDEBUG4) << "HandEvaluator::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel* players)" << std::endl;
+	Debug::log(LDEBUG4) << "HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel* players)" << std::endl;
 
 	int	niterations = 1000;		// for now we'll default our simulation iteration limit at 1000
 	win = tie = lose = 0;		// reset our simulation counters to 0
@@ -140,20 +140,20 @@ double	HandEvaluator::CalculateProbabilityOfWinning(TableInformation* table, Opp
 	return p_win;
 }
 
-inline void HandEvaluator::DealCardsToOpponent(OpponentModel* opponent, unsigned char* player_cards, unsigned char* card_mask)
+inline void HandAnalyzer::DealCardsToOpponent(OpponentModel* opponent, unsigned char* player_cards, unsigned char* card_mask)
 {
 }
 
-inline void HandEvaluator::DealFlop(unsigned char* common_cards, unsigned char* card_mask)
+inline void HandAnalyzer::DealFlop(unsigned char* common_cards, unsigned char* card_mask)
 {
 }
-inline void HandEvaluator::DealTurn(unsigned char* common_cards, unsigned char* card_mask)
+inline void HandAnalyzer::DealTurn(unsigned char* common_cards, unsigned char* card_mask)
 {
 }
-inline void HandEvaluator::DealRiver(unsigned char* common_cards, unsigned char* card_mask)
+inline void HandAnalyzer::DealRiver(unsigned char* common_cards, unsigned char* card_mask)
 {
 }
-inline int HandEvaluator::EvaluateBestSevenCardHand(unsigned char* player_cards, unsigned char* common_cards)
+inline int HandAnalyzer::EvaluateBestSevenCardHand(unsigned char* player_cards, unsigned char* common_cards)
 {
 	Hand	hand;
 	int		peval_value;
