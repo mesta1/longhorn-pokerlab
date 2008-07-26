@@ -11,6 +11,37 @@ TableInformation::~TableInformation(void)
 {
 }
 
+// TableContext accessor function for the ostream << operator
+// usage: cout << (TableContext) mycontext << endl;
+//
+ostream& operator <<(ostream &os, const TableContext& context)
+{
+	char buffer[256];
+
+	os << "TABLE_CONTEXT:" << endl;
+
+	CARDTOSTR(&buffer[0], context.bot_cards[0]);
+	CARDTOSTR(&buffer[2], context.bot_cards[1]);
+	buffer[4] = 0;
+	os << "bot_cards: " << buffer;
+
+	CARDTOSTR(&buffer[0], context.common_cards[0]);
+	CARDTOSTR(&buffer[2], context.common_cards[1]);
+	CARDTOSTR(&buffer[4], context.common_cards[2]);
+	CARDTOSTR(&buffer[6], context.common_cards[3]);
+	CARDTOSTR(&buffer[8], context.common_cards[4]);
+	buffer[10] = 0;
+	os << " common_cards: " << buffer << " betting_round: " << context.betting_round << endl;
+
+	os << "common_pot: " << context.common_pot << " context.total_pot: " << context.total_pot << endl;
+	os << "bot_deal_position: " << context.bot_deal_position << " bot_bet_position: " << context.bot_bet_position << endl;
+	os << "num_players_dealt: " << context.num_players_dealt << " num_players_playing: " << context.num_players_playing << endl;
+	os << "num_players_behind: " << context.num_players_behind << endl;
+
+	return os;
+}
+
+// Append the newest table context information to our stored history
 int TableInformation::UpdateTableContext(TableContext& context)
 {
 	Debug::log(LTRACE) << "TableInformation::UpdateTableContext(TableContext& context)" << std::endl;
@@ -54,12 +85,19 @@ TableContext* TableInformation::GetCurrentTableContext(void)
 int TableInformation::HasTableContextChanged(TableContext& new_context)
 {
 	Debug::log(LTRACE) << "TableInformation::HasTableContextChanged(TableContext& new_context)" << std::endl;
+//	Debug::log(LDEBUG) << "table_context[index].betting_round: " << table_context[index].betting_round << std::endl;
+//	Debug::log(LDEBUG) << "table_context[index].total_pot: " << table_context[index].total_pot << std::endl;
+//	Debug::log(LDEBUG) << "new_context.betting_round: " << new_context.betting_round << std::endl;
+//	Debug::log(LDEBUG) << "new_context.total_pot: " << new_context.total_pot << std::endl;
+
+	// If this is the first call for the hand return true;
+	if (index == 0) return 1;
 
 	// NOTE: Need to verify that these are the only material changes we are
 	// concerned about.
 
-	if (table_context[index].betting_round != new_context.betting_round) return 0;	// save context if new betting round
-	if (table_context[index].total_pot != new_context.total_pot) return 0;			// save context if anyone bets/raises
+	if (table_context[index].betting_round != new_context.betting_round) return 1;	// save context if new betting round
+	if (table_context[index].total_pot != new_context.total_pot) return 1;			// save context if anyone bets/raises
 
-	return 1;
+	return 0;
 }

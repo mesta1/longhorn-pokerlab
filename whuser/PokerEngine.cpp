@@ -79,12 +79,13 @@ int PokerEngine::getAction()
 //
 int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state* state)
 {
-	Debug::log(LTRACE) << "PokerEngine::updateTableContext(pfgws_t* pget_winholdem_symbol, holdem_state* state)" << std::endl;
-
 	bool iserr;
 	char str[16];
 	TableContext new_context;
+	PlayerContext player_context[10];
 	
+	Debug::log(LDEBUG4) << "PokerEngine::updateTableContext(pfgws_t* pget_winholdem_symbol, holdem_state* state)" << std::endl;
+
 	/////////////////////////////////////////////////////////////
 	// First, pull all the information on the new table context
 	//
@@ -95,19 +96,32 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 	new_context.total_pot = (*pget_winholdem_symbol)(mychair,"pot",iserr);
 
 	new_context.bot_chair = mychair;
-	new_context.dealer_chair = (*pget_winholdem_symbol)(mychair,"dealerchair",iserr);
+	new_context.dealer_chair = (int)(*pget_winholdem_symbol)(mychair,"dealerchair",iserr);
 
-	new_context.bot_cards[0] = state->m_cards[0];
-	new_context.bot_cards[1] = state->m_cards[1];
+	new_context.bot_cards[0] = state->m_player[mychair].m_cards[0];
+	new_context.bot_cards[1] = state->m_player[mychair].m_cards[1];
 
-	new_context.betting_round = (*pget_winholdem_symbol)(mychair,"betround",iserr);
+	new_context.common_cards[0] = state->m_cards[0];
+	new_context.common_cards[1] = state->m_cards[1];
+	new_context.common_cards[2] = state->m_cards[2];
+	new_context.common_cards[3] = state->m_cards[3];
+	new_context.common_cards[4] = state->m_cards[4];
+
+	new_context.betting_round = (int)(*pget_winholdem_symbol)(mychair,"betround",iserr);
 
 	new_context.bets_to_call = (*pget_winholdem_symbol)(mychair,"nbetstocall",iserr);
 	new_context.bets_to_raise = (*pget_winholdem_symbol)(mychair,"nbetstorais",iserr);
 	new_context.current_bets = (*pget_winholdem_symbol)(mychair,"ncurrentbets",iserr);
 
-	PlayerContext player_context[10];
-	for (int i=0; i < 10; i++)		// Iterate through all ten players and pull their information
+	new_context.bot_deal_position = (int) (*pget_winholdem_symbol)(mychair,"dealposition",iserr);
+	new_context.bot_bet_position = (int) (*pget_winholdem_symbol)(mychair,"betposition",iserr);
+
+	new_context.num_players_dealt = (int) (*pget_winholdem_symbol)(mychair,"nplayersdealt",iserr);
+	new_context.num_players_playing = (int) (*pget_winholdem_symbol)(mychair,"nplayersplaying",iserr);
+	new_context.num_players_behind = new_context.num_players_playing - new_context.bot_bet_position;
+
+	// Iterate through all ten players and pull their information
+	for (int i=0; i < 10; i++)
 	{
 
 		memcpy(player_context[i].name, state->m_player[i].m_name, 16);
@@ -132,9 +146,11 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 	
 	if (table->HasTableContextChanged(new_context))
 	{
+		Debug::log(LDEBUG) << new_context << std::endl;
+
 		// Store the table context
 		table->UpdateTableContext(new_context);
-
+		
 		// Now tell the opponent model about our new player
 		// information
 		for (int i=0; i < 10; i++)
