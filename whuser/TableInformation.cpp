@@ -12,7 +12,7 @@ TableInformation::~TableInformation(void)
 
 int TableInformation::UpdateTableContext(TableContext& context)
 {
-	Debug::log(Debug::TRACE) << "TableInformation::UpdateTableContext(TableContext& context)" << std::endl;
+	Debug::log(LTRACE) << "TableInformation::UpdateTableContext(TableContext& context)" << std::endl;
 
 	table_context.common_pot = context.common_pot;
 	table_context.bot_chair = context.bot_chair;

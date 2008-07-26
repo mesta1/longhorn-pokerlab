@@ -21,6 +21,9 @@
 #include <windows.h>
 #include <atlstr.h>
 #include <conio.h>
+#include <iostream>
+#include <fstream>
+
 
 ////////////////////////////////////
 //consecutive states
@@ -28,12 +31,17 @@ holdem_state	m_holdem_state[256];
 unsigned char	m_ndx;
 ////////////////////////////////////
 
+////////////////////////////////////
+//Debug console globals
+//We should move this to Debug class
+std::streambuf* old_cout;
+
 PokerEngine* theEngine;
 pfgws_t m_pget_winholdem_symbol;
 
 double process_query(const char* pquery)
 {
-	Debug::log(Debug::TRACE) << "::process_state( holdem_state* pstate )" << std::endl;
+	Debug::log(LTRACE) << "::process_state( holdem_state* pstate )" << std::endl;
 	if (pquery==NULL)
 		return 0;
 
@@ -49,7 +57,7 @@ double process_query(const char* pquery)
 
 double process_state( holdem_state* pstate )
 {
-	Debug::log(Debug::TRACE) << "::process_state( holdem_state* pstate )" << std::endl;
+	Debug::log(LTRACE) << "::process_state( holdem_state* pstate )" << std::endl;
 
 	// Update the DLL with the latest table context
 	if (pstate!=NULL) {	m_holdem_state[ (++m_ndx)&0xff ] = *pstate; }
@@ -67,7 +75,7 @@ double process_state( holdem_state* pstate )
 
 WHUSER_API double process_message (const char* pmessage, const void* param)
 {
-	Debug::log(Debug::TRACE) << "::process_message (const char* pmessage, const void* param)" << std::endl;
+	Debug::log(LTRACE) << "::process_message (const char* pmessage, const void* param)" << std::endl;
 
 	if (pmessage==NULL) { return 0; }
 	if (param==NULL) { return 0; }
@@ -91,17 +99,17 @@ WHUSER_API double process_message (const char* pmessage, const void* param)
 	// get_winholdem_symbol() function.  We call this function to query
 	// OpenHoldem symbols.
 	if (strcmp(pmessage,"pfgws")==0) {	
-		_cprintf("MESSAGE: pfgws\n");
+		Debug::log(LDEBUG) << "MESSAGE: pfgws" << std::endl;
 		m_pget_winholdem_symbol = (pfgws_t)param;
 		return 0;
 	}
 
 	if (strcmp(pmessage,"event")==0 && strcmp((const char *) param, "load")==0) { 
-		_cprintf("MESSAGE: event-load\n");
+		Debug::log(LDEBUG) << "MESSAGE: event-load" << std::endl;
 	}
 
 	if (strcmp(pmessage,"event")==0 && strcmp((const char *) param, "unload")==0) { 
-		_cprintf("MESSAGE: event-unload\n");
+		Debug::log(LDEBUG) << "MESSAGE: event-unload" << std::endl;
 	}
 
 	return 0;
@@ -115,21 +123,36 @@ WHUSER_API double process_message (const char* pmessage, const void* param)
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)
 {
-	Debug::log(Debug::TRACE) << "::DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)" << std::endl;
+	Debug::log(LTRACE) << "::DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserved)" << std::endl;
 
-	switch (ul_reason_for_call)	{
+	switch (ul_reason_for_call)
+	{
 		case DLL_PROCESS_ATTACH:
-			AllocConsole();
-			Debug::log(Debug::INFO) << DLL_NAME << std::endl;
-			Debug::log(Debug::INFO) << "Version:" << DLL_VERSION << std::endl;
-			theEngine = new PokerEngine();		// Initialize our one and only PokerEngine
+
+			// Here we prepare the debug logger.  We'll be able to
+			// build this out to be a more robust logger which can
+			// log events to a file so that we can analyze the play
+
+			Debug::InitializeDebugConsole();		// Prepare the output console
+			Debug::SetLevel(LDEBUG);				// Define our reporting level (anything above the level is not output)
+
+			Debug::log(LINFO) << DLL_NAME << std::endl;
+			Debug::log(LINFO) << "Version: " << DLL_VERSION << std::endl;
+			Debug::log(LINFO) << "Beginning new DLL instance" << std::endl; 
+			Debug::LogDateAndTime(LINFO); Debug::log(LINFO) << std::endl;
+			Debug::log(LINFO) << "------------------------------------------------------" << std::endl;
+			// Initialize our one and only PokerEngine (NOTE: make this a singleton)
+			theEngine = new PokerEngine();
 			break;
+
 		case DLL_THREAD_ATTACH:
 			break;
+
 		case DLL_THREAD_DETACH:
 			break;
+
 		case DLL_PROCESS_DETACH:
-			FreeConsole();
+			Debug::DestroyDebugConsole();			// Return the output console to its previous state
 			if (theEngine) { delete theEngine; theEngine = NULL; }
 			break;
     }
