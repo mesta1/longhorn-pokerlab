@@ -1,16 +1,16 @@
-/*
-	Filename	:	whuser.cpp
-	Author(s)	:	winholdem development
-	Date		:	2004-JUN-25
-	Copyright	:	(c) 2004 HixoxiH Software
-	History		:
-*/
+//
+//	Filename	:	whuser.h
+//	Date		:	2008 Jul 26
+//	Description :
+//
+//	Copyright (c) 2008 David B. Conrad
+//
 
 #ifndef WHUSER_EXPORTS
 	#define WHUSER_EXPORTS
 #endif
 
-#define DLL_NAME		"Longhorn Limit Hold 'Em Poker Bot"
+#define DLL_NAME		"Longhorn Hold 'Em Poker Bot"
 #define DLL_VERSION		0x00010001		// Version 0.1.1
 
 #include "whuser.h"
@@ -24,7 +24,6 @@
 #include <conio.h>
 #include <iostream>
 #include <fstream>
-
 
 ////////////////////////////////////
 //  The one and only PokerEngine 
