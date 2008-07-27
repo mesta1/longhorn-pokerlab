@@ -10,7 +10,7 @@ LowLimitPreflopAnalyzer::~LowLimitPreflopAnalyzer(void)
 }
 
 /*
-	ishandinlist(unsigned char c[2], const char* card_list)
+	IsHandInList(unsigned char c[2], const char* card_list)
 
 	See if a given hand is in a list of hands
 	card_list must be formatted as follows:
@@ -38,13 +38,13 @@ ProbabilityTriple LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* ta
 	// NOTE(dbc): This expert is currently not correctly implemented 
 	// --------------------------------------------------------
 
-	if (isHandInList(cards, "AA KK"))
+	if (IsHandInList(cards, "AA KK"))
 	{
 		SET_PTRIPLE(ptriple, 0, .1, .9);  // Raise these premium hands in all situations
 		return ptriple;
 	}
 
-	if (isHandInList(cards, "AKs QQ JJ"))
+	if (IsHandInList(cards, "AKs QQ JJ"))
 	{
 		// Raise these premium hands only if less than three bets to call
 		if (context->bets_to_call >= 3) 
@@ -53,7 +53,7 @@ ProbabilityTriple LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* ta
 			{ SET_PTRIPLE(ptriple, 0, .1, .9); return ptriple; }
 	}
 
-	if (isHandInList(cards, "AQs AJs ATs"))
+	if (IsHandInList(cards, "AQs AJs ATs"))
 	{
 		// Raise these hands if: 
 		if(
@@ -80,7 +80,7 @@ ProbabilityTriple LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* ta
 		SET_PTRIPLE(ptriple, .1, .9, 0); return ptriple;
 	}
 
-	if (isHandInList(cards, "AQ AJ AT"))
+	if (IsHandInList(cards, "AQ AJ AT"))
 	{
 		// Raise these hands if: 
 		if(
@@ -99,7 +99,7 @@ ProbabilityTriple LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* ta
 		SET_PTRIPLE(ptriple, .1, .9, 0); return ptriple;
 	}
 
-	if (isHandInList(cards, "AQ KQ"))
+	if (IsHandInList(cards, "AQ KQ"))
 	{
 		// Raise these hands if: 
 		if(
@@ -121,7 +121,7 @@ ProbabilityTriple LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* ta
 		SET_PTRIPLE(ptriple, .1, .9, 0); return ptriple;
 	}
 
-	if (isHandInList(cards, "TT 99 88 77 66"))
+	if (IsHandInList(cards, "TT 99 88 77 66"))
 	{
 		// Limp with these hands:
 		if(
@@ -134,7 +134,7 @@ ProbabilityTriple LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* ta
 		SET_PTRIPLE(ptriple, .1, .9, 0); return ptriple;
 	}
 
-	if (isHandInList(cards, "55 44 33 22"))
+	if (IsHandInList(cards, "55 44 33 22"))
 	{
 		// Limp with these hands:
 		if(
@@ -147,7 +147,7 @@ ProbabilityTriple LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* ta
 		SET_PTRIPLE(ptriple, .1, .9, 0); return ptriple;
 	}
 
-	if (isHandInList(cards, "JTs T9s 98s"))
+	if (IsHandInList(cards, "JTs T9s 98s"))
 	{
 		// Limp with these hands:
 		if(
@@ -160,7 +160,7 @@ ProbabilityTriple LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* ta
 		SET_PTRIPLE(ptriple, .1, .9, 0); return ptriple;
 	}
 
-	if (isHandInList(cards, "JT T9 98"))
+	if (IsHandInList(cards, "JT T9 98"))
 	{
 		// Limp with these hands:
 		if(
@@ -173,7 +173,7 @@ ProbabilityTriple LowLimitPreflopAnalyzer::GetPreflopAction(TableInformation* ta
 		SET_PTRIPLE(ptriple, .1, .9, 0); return ptriple;
 	}
 
-	if (isHandInList(cards, "JT T9 98"))
+	if (IsHandInList(cards, "JT T9 98"))
 	{
 		// Limp with these hands:
 		if(

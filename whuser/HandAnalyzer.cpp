@@ -3,6 +3,7 @@
 #include "Hand.h"
 #include "Debug.h"
 
+#include <ctime>
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
@@ -17,7 +18,7 @@ HandAnalyzer::~HandAnalyzer(void)
 
 ProbabilityTriple HandAnalyzer::GetPreflopAction(TableInformation* table)
 {
-	Debug::log(LTRACE) << "HandAnalyzer::GetPreflopAction(TableInformation* table)" << std::endl;
+	Debug::log(LTRACE) << "HandAnalyzer::GetPreflopAction(TableInformation& table)" << std::endl;
 
 	ProbabilityTriple ptriple;
 	SET_PTRIPLE(ptriple, 1, 0, 0);
@@ -26,14 +27,22 @@ ProbabilityTriple HandAnalyzer::GetPreflopAction(TableInformation* table)
 
 ProbabilityTriple HandAnalyzer::GetPostflopAction(TableInformation* table)
 {
-	Debug::log(LTRACE) << "HandAnalyzer::GetPostflopAction(TableInformation* table)" << std::endl;
+	Debug::log(LTRACE) << "HandAnalyzer::GetPostflopAction(TableInformation& table)" << std::endl;
 
 	ProbabilityTriple ptriple;
 	SET_PTRIPLE(ptriple, 1, 0, 0);
 	return ptriple;
 }
 
-int HandAnalyzer::isHandInList(unsigned char c[2], const char* card_list)
+void HandAnalyzer::RunCalculations(TableInformation* table, OpponentModel** players)
+{
+	Debug::log(LTRACE) << "HandAnalyzer::RunCalculations(TableInformation& table, OpponentModel* players)" << std::endl;
+
+	CalculateProbabilityOfWinning(table, players);
+
+}
+
+int HandAnalyzer::IsHandInList(unsigned char c[2], const char* card_list)
 {
 	char strhand[4]; strhand[3] = NULL;
 	char revstrhand[4]; revstrhand[3] = NULL;
@@ -64,16 +73,17 @@ int HandAnalyzer::isHandInList(unsigned char c[2], const char* card_list)
 //
 // NOTE: Player limits are hardcoded to 10
 //
-double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel* players)
+double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel** players)
 {
-	unsigned char	used_card_mask[52];
+	unsigned char	used_card_mask[64] = {0};
 
 	unsigned char	player_cards[10][2];
 	unsigned char	common_cards[5];
 
-	double			p_win, p_tie, p_lose;
+	int				niterations;
 	int				win, tie, lose;
 	int				bot_hand_value, opp_hand_value[10];
+	int				best_opp_value;
 	int				i,j;
 
 	LARGE_INTEGER	counter_start, counter_end, frequency;
@@ -81,9 +91,12 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 
 	TableContext*	table_context;
 
-	Debug::log(LDEBUG4) << "HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel* players)" << std::endl;
+	Debug::log(LDEBUG) << "HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel* players)" << std::endl;
 
-	int	niterations = 1000;		// for now we'll default our simulation iteration limit at 1000
+	// Provide initial seed for our random number generator
+	srand((unsigned)time(0));
+
+	niterations = 1000;			// for now we'll default our simulation iteration limit at 1000
 	win = tie = lose = 0;		// reset our simulation counters to 0
 
 	// Record our starting time to track performance
@@ -91,15 +104,27 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 
 	// Retrieve our current table context
 	table_context = table->GetCurrentTableContext();
-	for (i=0; i < 5; i++) common_cards[i] = table_context->common_cards[i];
 
+	// Remove our hole cards from the deck
+	used_card_mask[ABSOLUTEVAL(table_context->bot_cards[0])] = 1;
+	used_card_mask[ABSOLUTEVAL(table_context->bot_cards[1])] = 1;
+
+	// Retrieve our common cards and remove them from the deck
+	for (i=0; i < 5; i++)
+	{
+		common_cards[i] = table_context->common_cards[i];
+		if (ISVALIDCARD(common_cards[i])) used_card_mask[ABSOLUTEVAL(common_cards[i])] = 1;
+	}
+
+	///////////////////////////////////////////////////////////
 	// MONTE CARLO SIMULATION
-	// POKER EVALUATOR
+	// POKER HAND EVALUATOR
 	// Begin the Monte Carlo simulation
+
 	for (i=0; i < niterations; i++)
 	{
 		// Deal random cards to each player
-		for (j=0; j < 10; j++) { DealCardsToOpponent(&players[j], player_cards[j], used_card_mask); }
+		for (j=0; j < 10; j++) { DealCardsToOpponent(players[j], player_cards[j], used_card_mask); }
 
 		// Roll out random common cards
 		if (table_context->betting_round < FLOP) DealFlop(common_cards, used_card_mask);
@@ -109,27 +134,30 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 		// Determine what our best hand is
 		bot_hand_value = EvaluateBestSevenCardHand(table_context->bot_cards, common_cards);
 
-		for (j=0; j < 10; j++) {
-
+		// Run through our opponent hands and determine which
+		// opponent had the best hand
+		best_opp_value = 0;
+		for (j=0; j < 10; j++)
+		{
 			opp_hand_value[j] = EvaluateBestSevenCardHand(player_cards[j], common_cards);
-			if (opp_hand_value[j] > bot_hand_value)
-			{
-				lose++;
-			}
-			else if (opp_hand_value[j] == bot_hand_value)
-			{
-				tie++;
-			}
-			else
-			{
-				win++;
-			}
+			if (opp_hand_value[j] > best_opp_value) best_opp_value = opp_hand_value[j];
 		}	
 
-		p_win = win / niterations;
-		p_tie = tie / niterations;
-		p_lose = lose / niterations;
+		// Determine whether we win, lose or tie
+		if (best_opp_value > bot_hand_value)
+			lose++;
+		else if (best_opp_value == bot_hand_value)
+			tie++;
+		else
+			win++;
+
 	}	
+
+	// Average our win/tie/lose counts to determine our
+	// probabilities of each event
+	p_win = win / niterations;
+	p_tie = tie / niterations;
+	p_lose = lose / niterations;
 
 	// Record our ending timer count and calculate our performance_time
 	// in seconds for running the simulation.
@@ -142,16 +170,60 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 
 inline void HandAnalyzer::DealCardsToOpponent(OpponentModel* opponent, unsigned char* player_cards, unsigned char* card_mask)
 {
+	int				i;
+
+	// For now, leave out the weighted opponent hand table and assume
+	// every card has an equal chance of being held by every opponent
+
+	// Pull random cards until we get two that are not marked as already dealt
+	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
+	card_mask[i] = 1;
+	player_cards[0] = ABVALTOCARD(i);
+ 	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
+	card_mask[i] = 1;
+	player_cards[1] = ABVALTOCARD(i);
+
+	return;
 }
 
 inline void HandAnalyzer::DealFlop(unsigned char* common_cards, unsigned char* card_mask)
 {
+	int				i;
+
+	// Pull random cards until we get three that are not marked as used
+	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
+	card_mask[i] = 1;
+	common_cards[0] = ABVALTOCARD(i);
+ 	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
+	card_mask[i] = 1;
+	common_cards[1] = ABVALTOCARD(i);
+ 	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
+	card_mask[i] = 1;
+	common_cards[2] = ABVALTOCARD(i);
+
+	return;
 }
 inline void HandAnalyzer::DealTurn(unsigned char* common_cards, unsigned char* card_mask)
 {
+	int				i;
+
+	// Pull random cards until we get one that is not marked as used
+	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
+	card_mask[i] = 1;
+	common_cards[3] = ABVALTOCARD(i);
+
+	return;
 }
 inline void HandAnalyzer::DealRiver(unsigned char* common_cards, unsigned char* card_mask)
 {
+	int				i;
+
+	// Pull random cards until we get one that is not marked as used
+	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
+	card_mask[i] = 1;
+	common_cards[4] = ABVALTOCARD(i);
+
+	return;
 }
 inline int HandAnalyzer::EvaluateBestSevenCardHand(unsigned char* player_cards, unsigned char* common_cards)
 {
