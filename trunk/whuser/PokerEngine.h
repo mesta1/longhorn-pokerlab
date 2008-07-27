@@ -26,7 +26,7 @@ private:
 	HandAnalyzer*		preflop_analyzer;
 	HandAnalyzer*		postflop_analyzer;
 
-	TableInformation*	table;
+	TableInformation	table;
 	OpponentModel*		player[10];
 
 public:

@@ -5,7 +5,6 @@
 #include "LowLimitPostflopAnalyzer.h"
 #include "OpponentModel.h"
 
-#include <ctime>
 #include <conio.h>
 #include <stdio.h>
 #include <string.h>
@@ -16,20 +15,15 @@ PokerEngine::PokerEngine(void)
 	// evaluator.  For now, just use the default ones in development
 	preflop_analyzer = new LowLimitPreflopAnalyzer();
 	postflop_analyzer = new LowLimitPostflopAnalyzer();
-	
-	table = new TableInformation();
 
 	for (int i=0; i<10; i++) player[i] = new OpponentModel();
-
-	// Provide initial seed for our random number generator
-	srand((unsigned)time(0));
+	
 }
 
 PokerEngine::~PokerEngine(void)
 {
 	if (preflop_analyzer) { delete preflop_analyzer; preflop_analyzer = 0; }
 	if (postflop_analyzer) { delete postflop_analyzer; postflop_analyzer = 0; }
-	if (table) { delete table; table = 0; }
 	for (int i=0; i<10; i++) { if (player[i]) { delete player[i]; player[i] = 0; } }
 }
 
@@ -42,7 +36,7 @@ int PokerEngine::getPreflopAction()
     double random; 
 
 	// Get our probability triple P(f,c,r) given our current table context
-	ptriple = preflop_analyzer->GetPreflopAction(table);
+	ptriple = preflop_analyzer->GetPreflopAction(&table);
 
 	// Generate a random number 0.00 - 1.00
 	random = rand()/(RAND_MAX + 1.0); 
@@ -84,7 +78,7 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 	TableContext new_context;
 	PlayerContext player_context[10];
 	
-	Debug::log(LDEBUG4) << "PokerEngine::updateTableContext(pfgws_t* pget_winholdem_symbol, holdem_state* state)" << std::endl;
+	Debug::log(LDEBUG4) << "PokerEngine::UpdateTableContext(pfgws_t* pget_winholdem_symbol, holdem_state* state)" << std::endl;
 
 	/////////////////////////////////////////////////////////////
 	// First, pull all the information on the new table context
@@ -144,12 +138,12 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 	// NOTE: not sure we can determine "check" right now. 
 	// TODO: investigate "check"
 	
-	if (table->HasTableContextChanged(new_context))
+	if (table.HasTableContextChanged(new_context))
 	{
-		Debug::log(LDEBUG) << new_context << std::endl;
+		Debug::log(LDEBUG) << new_context;
 
 		// Store the table context
-		table->UpdateTableContext(new_context);
+		table.UpdateTableContext(new_context);
 		
 		// Now tell the opponent model about our new player
 		// information
@@ -169,6 +163,24 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 		// a Nash-equilibrium optimized solution.
 		// 
 		// if (AreWeHeadsUp()) postflop_analyzer = p_HeadsUpLimitNashEqAnalyzer;
+
+		// Finally, rerun statistical calculations with the latest 
+		// information. We will be able to morph this into a
+		// separate thread (or threads for multicore!) that
+		// runs in parallel and does not slow down our UI or table
+		// scraper.  Only run these calculations if our bot is ready.
+		if (ISVALIDCARD(new_context.bot_cards[0])&&
+			ISVALIDCARD(new_context.bot_cards[1]))
+		{
+			if (new_context.betting_round == PREFLOP)
+			{
+				preflop_analyzer->RunCalculations(&table, &player[0]);
+			}
+			else
+			{
+				postflop_analyzer->RunCalculations(&table, &player[0]);
+			}
+		}
 		
 	}
 
