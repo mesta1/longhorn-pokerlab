@@ -74,10 +74,10 @@ enum BETTING_ROUND {
 	RIVER
 };
 
-// Use this definition for the maximum number of players.  We
+// Use this definition for the maximum number of opponents.  We
 // may want to make this configurable.  Note that this is not
 // the same as the maximum players at a table (which may be 9)
-#define	MAX_PLAYERS		10;
+#define	MAX_OPPONENTS		9
 
 #define SET_PTRIPLE(a,b,c,d) {a.fold = b; a.checkcall = c; a.betraise = d;}
 
@@ -117,7 +117,7 @@ enum BETTING_ROUND {
 
 #define RANK(c)			((c>>4)&0x0f)					// Rank value of card (2-14) (see above)
 #define SUIT(c)			((c>>0)&0x0f)					// Suit value of card (1-4) (see above)
-#define ABSOLUTEVAL(c)	(((RANK(c)-2)*4)+(SUIT(c)))		// Absolute value of card (returns 0-51)
+#define ABSOLUTEVAL(c)	(((RANK(c)-2)*4)+(SUIT(c)-1))	// Absolute value of card (returns 0-51)
 #define ABVALTOCARD(v)	(_absoluteval_deck[v])
 #define SETRANK(c, r)	((c&0xf0) | (r<<4))
 #define SETSUIT(c, s)	((c&0x0f) | s)

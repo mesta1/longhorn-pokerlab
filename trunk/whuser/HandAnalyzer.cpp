@@ -73,9 +73,11 @@ int HandAnalyzer::IsHandInList(unsigned char c[2], const char* card_list)
 //
 // NOTE: Player limits are hardcoded to 10
 //
+// NOTE: Speed is absolutely critical in this function.  Will need more
+// work to optimize it.
 double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel** players)
 {
-	unsigned char	used_card_mask[64] = {0};
+	unsigned char	used_card_mask[64];
 
 	unsigned char	player_cards[10][2];
 	unsigned char	common_cards[5];
@@ -91,12 +93,12 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 
 	TableContext*	table_context;
 
-	Debug::log(LDEBUG) << "HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel* players)" << std::endl;
+	Debug::log(LDEBUG) << "HandAnalyzer::CalculateProbabilityOfWinning()" << std::endl;
 
 	// Provide initial seed for our random number generator
 	srand((unsigned)time(0));
 
-	niterations = 1000;			// for now we'll default our simulation iteration limit at 1000
+	niterations = 10000;			// for now we'll default our simulation iteration limit at 1000
 	win = tie = lose = 0;		// reset our simulation counters to 0
 
 	// Record our starting time to track performance
@@ -105,16 +107,9 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 	// Retrieve our current table context
 	table_context = table->GetCurrentTableContext();
 
-	// Remove our hole cards from the deck
-	used_card_mask[ABSOLUTEVAL(table_context->bot_cards[0])] = 1;
-	used_card_mask[ABSOLUTEVAL(table_context->bot_cards[1])] = 1;
 
-	// Retrieve our common cards and remove them from the deck
-	for (i=0; i < 5; i++)
-	{
-		common_cards[i] = table_context->common_cards[i];
-		if (ISVALIDCARD(common_cards[i])) used_card_mask[ABSOLUTEVAL(common_cards[i])] = 1;
-	}
+	// Retrieve our common cards
+	for (i=0; i < 5; i++) common_cards[i] = table_context->common_cards[i];
 
 	///////////////////////////////////////////////////////////
 	// MONTE CARLO SIMULATION
@@ -123,8 +118,21 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 
 	for (i=0; i < niterations; i++)
 	{
+		// Reset the card mask;
+		for (j=0; j<52; j++) used_card_mask[j] = 0;
+
+		// Remove our hole cards from the deck
+		used_card_mask[ABSOLUTEVAL(table_context->bot_cards[0])] = 1;
+		used_card_mask[ABSOLUTEVAL(table_context->bot_cards[1])] = 1;
+
+		// Remove our common cards from the deck
+		for (j=0; j < 5; j++)
+		{
+			if (ISVALIDCARD(common_cards[j])) used_card_mask[ABSOLUTEVAL(common_cards[j])] = 1;
+		}
+
 		// Deal random cards to each player
-		for (j=0; j < 10; j++) { DealCardsToOpponent(players[j], player_cards[j], used_card_mask); }
+		for (j=0; j < MAX_OPPONENTS; j++) { DealCardsToOpponent(players[j], player_cards[j], used_card_mask); }
 
 		// Roll out random common cards
 		if (table_context->betting_round < FLOP) DealFlop(common_cards, used_card_mask);
@@ -137,7 +145,7 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 		// Run through our opponent hands and determine which
 		// opponent had the best hand
 		best_opp_value = 0;
-		for (j=0; j < 10; j++)
+		for (j=0; j < MAX_OPPONENTS; j++)
 		{
 			opp_hand_value[j] = EvaluateBestSevenCardHand(player_cards[j], common_cards);
 			if (opp_hand_value[j] > best_opp_value) best_opp_value = opp_hand_value[j];
@@ -145,19 +153,28 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 
 		// Determine whether we win, lose or tie
 		if (best_opp_value > bot_hand_value)
+		{
 			lose++;
+		}
 		else if (best_opp_value == bot_hand_value)
+		{
 			tie++;
+		}
 		else
+		{
 			win++;
+		}
 
 	}	
 
 	// Average our win/tie/lose counts to determine our
 	// probabilities of each event
-	p_win = win / niterations;
-	p_tie = tie / niterations;
-	p_lose = lose / niterations;
+	p_win = (double)win / (double)niterations;
+	p_tie = (double)tie / (double)niterations;
+	p_lose = (double)lose / (double)niterations;
+
+	Debug::log(LDEBUG) << "win: " << win << " tie: " << tie << " lose: " << lose << endl;
+	Debug::log(LDEBUG) << "p_win: " << p_win << " p_tie: " << p_tie << " p_lose: " << p_lose << endl;
 
 	// Record our ending timer count and calculate our performance_time
 	// in seconds for running the simulation.
@@ -228,7 +245,6 @@ inline void HandAnalyzer::DealRiver(unsigned char* common_cards, unsigned char* 
 inline int HandAnalyzer::EvaluateBestSevenCardHand(unsigned char* player_cards, unsigned char* common_cards)
 {
 	Hand	hand;
-	int		peval_value;
 
 	hand.AddCard(player_cards[0]);
 	hand.AddCard(player_cards[1]);
@@ -239,8 +255,6 @@ inline int HandAnalyzer::EvaluateBestSevenCardHand(unsigned char* player_cards, 
 	hand.AddCard(common_cards[3]);
 	hand.AddCard(common_cards[4]);
 
-	peval_value = hand.Evaluate();
-
-	return peval_value;
+	return hand.Evaluate();
 
 }

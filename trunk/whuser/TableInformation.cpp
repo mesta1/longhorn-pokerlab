@@ -67,6 +67,12 @@ int TableInformation::UpdateTableContext(TableContext& context)
 	table_context[index].bot_cards[0] = context.bot_cards[0];
 	table_context[index].bot_cards[1] = context.bot_cards[1];
 
+	table_context[index].common_cards[0] = context.common_cards[0];
+	table_context[index].common_cards[1] = context.common_cards[1];
+	table_context[index].common_cards[2] = context.common_cards[2];
+	table_context[index].common_cards[3] = context.common_cards[3];
+	table_context[index].common_cards[4] = context.common_cards[4];
+
 	table_context[index].betting_round = context.betting_round;
 
 	table_context[index].bets_to_call = context.bets_to_call;

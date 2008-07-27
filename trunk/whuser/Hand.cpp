@@ -46,8 +46,6 @@ int Hand::Evaluate(void)
 {
     CardMask            eval_cards;
 
-	Debug::log(LDEBUG4) << "Hand::Evaluate(void)" << std::endl;
-
 	// Set a poker-eval card mask with the values of all the cards
 	CardMask_RESET(eval_cards);
 	for(int i=0 ; i<m_size ; ++i)
