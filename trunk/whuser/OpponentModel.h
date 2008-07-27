@@ -14,6 +14,7 @@ struct PlayerContext {
 
 	double          current_bet;	//player current bet
 	double          chips_in_play;	//total in each pot
+	int				is_playing;		//1 if still holds cards, 0 if folded or not dealt
 
 };
 
@@ -25,6 +26,7 @@ public:
 
 	int UpdatePlayerContext(PlayerContext& player_context);
 	int HasPlayerContextChanged(PlayerContext& player_context);
+	PlayerContext* GetPlayerContext(void);
 
 private:
 
