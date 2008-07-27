@@ -181,6 +181,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\poker-eval\Release"
+				IgnoreDefaultLibraryNames="LIBCMT.lib"
 				ProgramDatabaseFile=".\Release/whuser.pdb"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"

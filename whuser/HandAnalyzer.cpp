@@ -107,7 +107,6 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 	// Retrieve our current table context
 	table_context = table->GetCurrentTableContext();
 
-
 	// Retrieve our common cards
 	for (i=0; i < 5; i++) common_cards[i] = table_context->common_cards[i];
 
@@ -132,7 +131,13 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 		}
 
 		// Deal random cards to each player
-		for (j=0; j < MAX_OPPONENTS; j++) { DealCardsToOpponent(players[j], player_cards[j], used_card_mask); }
+		for (j=0; j < MAX_OPPONENTS; j++)
+		{ 
+			// Skip our own seat
+			if (j == table_context->bot_chair) continue;
+
+			DealCardsToOpponent(players[j], player_cards[j], used_card_mask); 
+		}
 
 		// Roll out random common cards
 		if (table_context->betting_round < FLOP) DealFlop(common_cards, used_card_mask);
@@ -147,11 +152,18 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 		best_opp_value = 0;
 		for (j=0; j < MAX_OPPONENTS; j++)
 		{
+			// Skip our own seat
+			if (j == table_context->bot_chair) continue;
+
+			// Skip players that folded or are sitting out
+			if (players[j]->GetPlayerContext()->is_playing == 0) continue;
+
 			opp_hand_value[j] = EvaluateBestSevenCardHand(player_cards[j], common_cards);
 			if (opp_hand_value[j] > best_opp_value) best_opp_value = opp_hand_value[j];
 		}	
 
-		// Determine whether we win, lose or tie
+		// Determine whether we win, lose or tie with our
+		// opponents best hand
 		if (best_opp_value > bot_hand_value)
 		{
 			lose++;
@@ -173,14 +185,15 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 	p_tie = (double)tie / (double)niterations;
 	p_lose = (double)lose / (double)niterations;
 
-	Debug::log(LDEBUG) << "win: " << win << " tie: " << tie << " lose: " << lose << endl;
-	Debug::log(LDEBUG) << "p_win: " << p_win << " p_tie: " << p_tie << " p_lose: " << p_lose << endl;
-
 	// Record our ending timer count and calculate our performance_time
 	// in seconds for running the simulation.
 	QueryPerformanceCounter(&counter_end);
 	QueryPerformanceFrequency(&frequency);
 	performance_time = (double) (counter_end.LowPart - counter_start.LowPart) / (double) frequency.LowPart;
+
+	Debug::log(LDEBUG) << "win: " << win << " tie: " << tie << " lose: " << lose << endl;
+	Debug::log(LDEBUG) << "p_win: " << p_win << " p_tie: " << p_tie << " p_lose: " << p_lose << endl;
+	Debug::log(LDEBUG) << "nterations: " << niterations << " time: " << performance_time << endl;
 
 	return p_win;
 }
@@ -191,6 +204,14 @@ inline void HandAnalyzer::DealCardsToOpponent(OpponentModel* opponent, unsigned 
 
 	// For now, leave out the weighted opponent hand table and assume
 	// every card has an equal chance of being held by every opponent
+
+	// If this opponent is not playing (i.e., folded or sitting out) do not deal him cards
+	if (opponent->GetPlayerContext()->is_playing == 0)
+	{
+		player_cards[0] = CARD_NOCARD;
+		player_cards[1] = CARD_NOCARD;
+		return;
+	}
 
 	// Pull random cards until we get two that are not marked as already dealt
 	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));

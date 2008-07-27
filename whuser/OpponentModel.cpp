@@ -22,6 +22,11 @@ OpponentModel::~OpponentModel(void)
 {
 }
 
+PlayerContext* OpponentModel::GetPlayerContext(void)
+{
+	return (&context);
+}
+
 void OpponentModel::UpdateHoleCardGraph(void)
 {
 /*	int i, j;
@@ -82,16 +87,13 @@ int OpponentModel::UpdatePlayerContext(PlayerContext& player_context)
 {
 	Debug::log(LTRACE) << "OpponentModel::UpdatePlayerContext(PlayerContext& player_context)" << std::endl;
 
-	// For now, the name must be the same.
-	if (player_context.name != context.name)
-		return 0;
-
 	context.balance = player_context.balance;
 
 	context.cards[0] = player_context.cards[0];
 	context.cards[1] = player_context.cards[1];
 
 	context.current_bet = player_context.current_bet;
+	context.is_playing = player_context.is_playing;
 
 	return 1;	
 }
@@ -103,8 +105,9 @@ int OpponentModel::HasPlayerContextChanged(PlayerContext& player_context)
 	// NOTE: Need to verify that these are the only material changes we are
 	// concerned about.
 
-	if (context.balance != player_context.balance) return 0;
-	if (context.current_bet != player_context.current_bet) return 0;
+	if (context.balance != player_context.balance) return 1;
+	if (context.current_bet != player_context.current_bet) return 1;
+	if (context.is_playing != player_context.is_playing) return 1;
 
-	return 1;
+	return 0;
 }

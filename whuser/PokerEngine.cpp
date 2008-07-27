@@ -77,7 +77,8 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 	char str[16];
 	TableContext new_context;
 	PlayerContext player_context[10];
-	
+	int	playersplayingbits;
+
 	Debug::log(LDEBUG4) << "PokerEngine::UpdateTableContext(pfgws_t* pget_winholdem_symbol, holdem_state* state)" << std::endl;
 
 	/////////////////////////////////////////////////////////////
@@ -114,6 +115,8 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 	new_context.num_players_playing = (int) (*pget_winholdem_symbol)(mychair,"nplayersplaying",iserr);
 	new_context.num_players_behind = new_context.num_players_playing - new_context.bot_bet_position;
 
+	playersplayingbits = (int) (*pget_winholdem_symbol)(mychair,"playersplayingbits",iserr);
+
 	// Iterate through all ten players and pull their information
 	for (int i=0; i < 10; i++)
 	{
@@ -128,7 +131,7 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 
 		sprintf_s(str, sizeof(str), "currentbet%u", (int)i);
 		player_context[i].current_bet = (*pget_winholdem_symbol)(mychair,str,iserr);
-
+		player_context[i].is_playing = ((playersplayingbits >> i)& 0x0001);
 	}
 
 	/////////////////////////////////////////////////////////////
@@ -182,6 +185,8 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 			}
 		}
 		
+		// That's all for now.  We'll wait until our PokerEngine is
+		// called again to determine what action to take.
 	}
 
 	return 0;
