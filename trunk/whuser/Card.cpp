@@ -33,7 +33,7 @@ void Card::Reset(void)
 // Construct the card from a hash value (0-51)
 Card::Card(int val)
 {
-	FromHash(val);
+	Set(val);
 }
 
 Card& Card::operator=(const Card &rhs) {
@@ -47,13 +47,9 @@ Card& Card::operator=(const Card &rhs) {
     return *this;
 }
 
-Card& Card::operator=(const Card &rhs) {
+Card& Card::operator=(const unsigned char &rhs) {
 
-    // Only do assignment if RHS is a different object from this.
-    if (this != &rhs) {
-		card = ;     
-		hash = rhs.hash;
-    }
+    this->Set(rhs);
 
     return *this;
 }
@@ -66,7 +62,7 @@ void Card::Set(int rank, int suit)
 // Set the value from an unsigned char (8-bit) card representation
 void Card::Set(unsigned char c)
 {
-	Set(((card>>4)&0x0f), 
+	Set(((card>>4)&0x0f), (card&0x0f)); 
 }
 
 // Set the card value from a hash value (0-51)
