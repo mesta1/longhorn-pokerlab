@@ -75,6 +75,9 @@ int HandAnalyzer::IsHandInList(unsigned char c[2], const char* card_list)
 //
 // NOTE: Speed is absolutely critical in this function.  Will need more
 // work to optimize it.
+
+int				used_card_counter[52];
+
 double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel** players)
 {
 	unsigned char	used_card_mask[64];
@@ -94,6 +97,7 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 	TableContext*	table_context;
 
 	Debug::log(LDEBUG) << "HandAnalyzer::CalculateProbabilityOfWinning()" << std::endl;
+	for (i=0; i<52; i++) used_card_counter[i] = 0;
 
 	// Provide initial seed for our random number generator
 	srand((unsigned)time(0));
@@ -195,12 +199,47 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 	Debug::log(LDEBUG) << "p_win: " << p_win << " p_tie: " << p_tie << " p_lose: " << p_lose << endl;
 	Debug::log(LDEBUG) << "nterations: " << niterations << " time: " << performance_time << endl;
 
+	for (i=0; i<13; i++)
+	{
+		Debug::log(LDEBUG) << "2: " << used_card_counter[(i*4)] << " " << used_card_counter[(i*4)+1] << " " << used_card_counter[(i*4)+2] << " " << used_card_counter[(i*4)+3] << " " << endl;
+	}
+
 	return p_win;
 }
 
 inline void HandAnalyzer::DealCardsToOpponent(OpponentModel* opponent, unsigned char* player_cards, unsigned char* card_mask)
 {
-	int				i;
+#if 0
+	unsigned char	cards[2];
+
+	// For now, leave out the weighted opponent hand table and assume
+	// every card has an equal chance of being held by every opponent
+
+	// If this opponent is not playing (i.e., folded or sitting out) do not deal him cards
+	if (opponent->GetPlayerContext()->is_playing == 0)
+	{
+		player_cards[0] = CARD_NOCARD;
+		player_cards[1] = CARD_NOCARD;
+		return;
+	}
+
+	// Deal a random hand (using weighted distribution from the opponent's hand table).
+	// Repeat if the hand we draw includes a used card.
+	do {
+		opponent->DealRandomHand(cards, card_mask);
+	} while (card_mask[ABSOLUTEVAL(cards[0])]==1 || card_mask[ABSOLUTEVAL(cards[1])]==1);
+
+	// We drew two valid cards.  Mark them as used.
+	card_mask[ABSOLUTEVAL(cards[0])] = 1;
+	card_mask[ABSOLUTEVAL(cards[1])] = 1;
+	used_card_counter[ABSOLUTEVAL(cards[0])]++;
+	used_card_counter[ABSOLUTEVAL(cards[1])]++;
+
+	player_cards[0] = cards[0];
+	player_cards[1] = cards[1];
+
+#else
+	int i;
 
 	// For now, leave out the weighted opponent hand table and assume
 	// every card has an equal chance of being held by every opponent
@@ -220,6 +259,7 @@ inline void HandAnalyzer::DealCardsToOpponent(OpponentModel* opponent, unsigned 
  	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
 	card_mask[i] = 1;
 	player_cards[1] = ABVALTOCARD(i);
+#endif
 
 	return;
 }
@@ -231,12 +271,17 @@ inline void HandAnalyzer::DealFlop(unsigned char* common_cards, unsigned char* c
 	// Pull random cards until we get three that are not marked as used
 	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
 	card_mask[i] = 1;
+	used_card_counter[i]++;
 	common_cards[0] = ABVALTOCARD(i);
- 	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
+
+	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
 	card_mask[i] = 1;
+	used_card_counter[i]++;
 	common_cards[1] = ABVALTOCARD(i);
- 	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
+
+	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
 	card_mask[i] = 1;
+	used_card_counter[i]++;
 	common_cards[2] = ABVALTOCARD(i);
 
 	return;
@@ -248,6 +293,7 @@ inline void HandAnalyzer::DealTurn(unsigned char* common_cards, unsigned char* c
 	// Pull random cards until we get one that is not marked as used
 	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
 	card_mask[i] = 1;
+	used_card_counter[i]++;
 	common_cards[3] = ABVALTOCARD(i);
 
 	return;
@@ -259,6 +305,7 @@ inline void HandAnalyzer::DealRiver(unsigned char* common_cards, unsigned char* 
 	// Pull random cards until we get one that is not marked as used
 	do { i = rand() & 63; } while ((i > 51) || (card_mask[i]==1));
 	card_mask[i] = 1;
+	used_card_counter[i]++;
 	common_cards[4] = ABVALTOCARD(i);
 
 	return;
