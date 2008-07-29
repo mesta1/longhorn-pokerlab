@@ -44,7 +44,6 @@ public:
 	int Suit(void) const;		// return the suit 1-4 (1=clubs, 4=spades)
 
 	int Hash(void) const;		// returns 0-51 (0 = 2c, 51 = As)
-	void FromHash(int);
 
 	int IsUnknown(void) const;
 	int IsValid(void) const;
@@ -52,8 +51,8 @@ public:
 	void ToString(char*) const;
 	void FromString(const char*);
 
-	Card& operator=(const Card &rhs);
-	Card& operator=(const unsigned char);
+	Card& operator=(const Card&);
+	Card& operator=(const unsigned char&);
 
 	/*------------------------------------------------------------
 	Card Values (from OpenHoldem wiki)
