@@ -28,6 +28,8 @@ public:
 	int HasPlayerContextChanged(PlayerContext& player_context);
 	PlayerContext* GetPlayerContext(void);
 
+	void DealRandomHand(unsigned char* cards, unsigned char* card_mask) { weight_table.DealRandomHand(cards, card_mask); }
+
 private:
 
 	// p_dealtcards
