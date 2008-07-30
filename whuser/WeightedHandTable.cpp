@@ -1,4 +1,5 @@
 #include "Global.h"
+#include "Card.h"
 #include "WeightedHandTable.h"
 
 #include <memory.h>
@@ -58,17 +59,17 @@ int WeightedHandTable::GetIndex(unsigned char card1, unsigned char card2)
 	{
 		switch (SUIT(card1))
 		{
-		case CLUBS:
-			if (SUIT(card2)==DIAMONDS) index += 0;
-			if (SUIT(card2)==HEARTS) index += 1;		
-			if (SUIT(card2)==SPADES) index += 2;
+		case Card::CLUBS:
+			if (SUIT(card2)==Card::DIAMONDS) index += 0;
+			if (SUIT(card2)==Card::HEARTS) index += 1;		
+			if (SUIT(card2)==Card::SPADES) index += 2;
 			break;
-		case DIAMONDS:
-			if (SUIT(card2)==HEARTS) index += 3;		
-			if (SUIT(card2)==SPADES) index += 4;
+		case Card::DIAMONDS:
+			if (SUIT(card2)==Card::HEARTS) index += 3;		
+			if (SUIT(card2)==Card::SPADES) index += 4;
 			break;
-		case HEARTS:
-			if (SUIT(card2)==SPADES) index += 5;
+		case Card::HEARTS:
+			if (SUIT(card2)==Card::SPADES) index += 5;
 			break;
 		}
 	} 
@@ -80,19 +81,19 @@ int WeightedHandTable::GetIndex(unsigned char card1, unsigned char card2)
 		// increase offset based upon suit of first card		
 		switch (SUIT(card1))
 		{
-		case HEARTS: index += 0; break;
-		case DIAMONDS: index += 4; break;
-		case CLUBS: index += 8; break;
-		case SPADES: index += 12; break;
+		case Card::HEARTS: index += 0; break;
+		case Card::DIAMONDS: index += 4; break;
+		case Card::CLUBS: index += 8; break;
+		case Card::SPADES: index += 12; break;
 		}
 
 		// increase offset to the correct suit for second card		
 		switch (SUIT(card2))
 		{
-		case HEARTS: index += 0; break;
-		case DIAMONDS: index += 1; break;
-		case CLUBS: index += 2; break;
-		case SPADES: index += 3; break;
+		case Card::HEARTS: index += 0; break;
+		case Card::DIAMONDS: index += 1; break;
+		case Card::CLUBS: index += 2; break;
+		case Card::SPADES: index += 3; break;
 		}
 	}
 

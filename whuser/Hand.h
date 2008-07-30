@@ -1,23 +1,31 @@
 #pragma once
 
 #include "inlines/eval.h"
+#include "Card.h"
 
 class Hand
 {
 public:
 	Hand(void);
+	Hand(unsigned char&, unsigned char&);
+	Hand(const Card&, const Card&);
 	~Hand(void);
 	
-	int Evaluate(void);
-	int AddCard(unsigned char);
+	int Evaluate(const CommonCards&);
+	int AddCard(const Card&);
 	void Reset(void);
 	void ToString(char*);
 
-	//unsigned int &operator[] (int);
+	Card operator[](const int) const;
 
 private:
-	int			cards[7];   // cards are stored in poker-eval format
+	int	ToPokerEvalCard(const Card& card) const;
+	int ToPokerEvalCard(const unsigned char card) const;
+	Card ToCard(int card) const;
+
+	int			cards[2];   // cards are stored in poker-eval format
 	HandVal		hand_value;
 	int			m_size;
 };
 
+ostream& operator <<(ostream&, const Hand&);
