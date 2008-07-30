@@ -4,6 +4,7 @@
 #define _GLOBAL_H_
 
 #include "OpponentModel.h"
+#include "Card.h"
 
 #include <string.h>
 
@@ -134,16 +135,18 @@ enum BETTING_ROUND {
 
 #define N_CARDS			52
 
+/*
 #define CLUBS			1
 #define DIAMONDS		2
 #define HEARTS			3
 #define SPADES			4
+*/
 
 #define	CARD_BACK		0xff
 #define	CARD_NOCARD		0x00
 
-static const char	_rtoc[17] = "[X23456789TJQKA[";
-static const char	_stoc[17] = "]cdhsxxxxxxxxxx]";
+//static const char	_rtoc[17] = "[X23456789TJQKA[";
+//static const char	_stoc[17] = "]cdhsxxxxxxxxxx]";
 
 // Convert card value to two character string
 inline unsigned char STRTOCARD(const char* str)
@@ -165,6 +168,7 @@ inline void CARDTOSTR(char* buf, unsigned char card)
 	return;
 }
 
+/*
 // Listing of cards by absolute value.  Use ABSOLUTEVAL(card)
 // to determine corresponding index into this array.
 static const unsigned char _absoluteval_deck[52] = 
@@ -183,5 +187,6 @@ static const unsigned char _absoluteval_deck[52] =
 		0xD1, 0xD2, 0xD3, 0xD4,
 		0xE1, 0xE2, 0xE3, 0xE4		// Ac Ad Ah As
 	};
+*/
 
 #endif

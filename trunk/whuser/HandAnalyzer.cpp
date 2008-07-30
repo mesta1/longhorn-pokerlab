@@ -75,7 +75,10 @@ int HandAnalyzer::IsHandInList(unsigned char c[2], const char* card_list)
 //
 // NOTE: Speed is absolutely critical in this function.  Will need more
 // work to optimize it.
-
+//
+// NOTE: This is so fast that our random generator can't catch up.  Need to
+// find seed with more granularity than time()
+//
 int				used_card_counter[52];
 
 double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, OpponentModel** players)
@@ -199,10 +202,10 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 	Debug::log(LDEBUG) << "p_win: " << p_win << " p_tie: " << p_tie << " p_lose: " << p_lose << endl;
 	Debug::log(LDEBUG) << "nterations: " << niterations << " time: " << performance_time << endl;
 
-	for (i=0; i<13; i++)
+	/*for (i=0; i<13; i++)
 	{
 		Debug::log(LDEBUG) << "2: " << used_card_counter[(i*4)] << " " << used_card_counter[(i*4)+1] << " " << used_card_counter[(i*4)+2] << " " << used_card_counter[(i*4)+3] << " " << endl;
-	}
+	}*/
 
 	return p_win;
 }
@@ -312,17 +315,17 @@ inline void HandAnalyzer::DealRiver(unsigned char* common_cards, unsigned char* 
 }
 inline int HandAnalyzer::EvaluateBestSevenCardHand(unsigned char* player_cards, unsigned char* common_cards)
 {
-	Hand	hand;
+	Hand	hand(Card(RANK(player_cards[0]),SUIT(player_cards[0])),
+				 Card(RANK(player_cards[1]),SUIT(player_cards[1])));
 
-	hand.AddCard(player_cards[0]);
-	hand.AddCard(player_cards[1]);
+	CommonCards commcards;
 
-	hand.AddCard(common_cards[0]);
-	hand.AddCard(common_cards[1]);
-	hand.AddCard(common_cards[2]);
-	hand.AddCard(common_cards[3]);
-	hand.AddCard(common_cards[4]);
+	commcards.flop1 = common_cards[0];
+	commcards.flop2 = common_cards[1];
+	commcards.flop3 = common_cards[2];
+	commcards.turn = common_cards[3];
+	commcards.river = common_cards[4];
 
-	return hand.Evaluate();
+	return hand.Evaluate(commcards);
 
 }
