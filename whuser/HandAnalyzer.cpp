@@ -43,19 +43,19 @@ void HandAnalyzer::RunCalculations(TableInformation* table, OpponentModel** play
 
 }
 
-int HandAnalyzer::IsHandInList(unsigned char c[2], const char* card_list)
+int HandAnalyzer::IsHandInList(Hand h, const char* card_list)
 {
 	char strhand[4]; strhand[3] = NULL;
 	char revstrhand[4]; revstrhand[3] = NULL;
 	const char ranktochar[]="xA23456789TJQKA";
 
 	// Convert hand from pokerval format to string
-	strhand[0] = ranktochar[RANK(c[0])];
-	strhand[1] = ranktochar[RANK(c[1])];
-	if (RANK(c[0])==RANK(c[1]))
+	strhand[0] = ranktochar[(h[0]).Rank()];
+	strhand[1] = ranktochar[(h[1]).Rank()];
+	if ((h[0]).Rank()==(h[1]).Rank())
 		strhand[2]=NULL;
 	else
-		ISSUITED(c[0],c[1]) ? strhand[2]='s' : strhand[2]=' ';
+		((h[0]).Suit()==(h[1]).Suit()) ? strhand[2]='s' : strhand[2]=' ';
 	
 	// Make mirror image of string in case cards are in reverse order
 	revstrhand[1] = strhand[0];
@@ -115,15 +115,14 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 	// Retrieve our current table context and common cards
 	table_context = table->GetCurrentTableContext();
 
-	common_cards.flop1 = table_context->common_cards[0];
-	common_cards.flop2 = table_context->common_cards[1];
-	common_cards.flop3 = table_context->common_cards[2];
-	common_cards.turn = table_context->common_cards[3];
-	common_cards.river = table_context->common_cards[4];
+	common_cards.flop1 = table_context->common_cards.flop1;
+	common_cards.flop2 = table_context->common_cards.flop2;
+	common_cards.flop3 = table_context->common_cards.flop3;
+	common_cards.turn = table_context->common_cards.turn;
+	common_cards.river = table_context->common_cards.river;
 
 	// Retrieve our bot's cards
-	bot_hand.SetCard(0, Card(table_context->bot_cards[0]));
-	bot_hand.SetCard(1, Card(table_context->bot_cards[1]));
+	bot_hand = table_context->bot_cards;
 
 	///////////////////////////////////////////////////////////
 	// MONTE CARLO SIMULATION

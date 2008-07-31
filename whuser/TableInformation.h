@@ -1,12 +1,15 @@
 #pragma once
 
+#include "Card.h"
+#include "Hand.h"
+
 #include <iostream>
 #include <string.h>
 using namespace std;
 
 struct TableContext {
 
-	unsigned char   common_cards[5];	//common cards
+	CommonCards		common_cards;		//common cards
 	double			common_pot;			//common pot (excluding current bets)
 	double			total_pot;			//total pot (including common pot and current bets)
 
@@ -19,7 +22,7 @@ struct TableContext {
 	int				num_players_playing;//number of players playing (have not folded) (including you) (0-10) 
 	int				num_players_behind; //number of players behind you (=num_players_playing - bot_bet_position)
 
-	unsigned char	bot_cards[2];		//bot cards
+	Hand			bot_cards;			//bot cards
 
 	int				betting_round;		//betting round (PREFLOP,FLOP,TURN,RIVER)
 

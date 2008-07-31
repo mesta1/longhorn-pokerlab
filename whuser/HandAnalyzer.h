@@ -21,7 +21,7 @@ public:
 
 protected:
 	// See if a given hand is in a list of hands
-	int IsHandInList(unsigned char c[2], const char* card_list);
+	int IsHandInList(Hand h, const char* card_list);
 
 private:
 	inline void DealCardsToOpponent(OpponentModel*, Hand*, unsigned char*);

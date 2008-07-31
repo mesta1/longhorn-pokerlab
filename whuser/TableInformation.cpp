@@ -16,15 +16,17 @@ TableInformation::~TableInformation(void)
 //
 ostream& operator <<(ostream &os, const TableContext& context)
 {
-	char buffer[256];
+//	char buffer[256];
 
 	os << "TABLE_CONTEXT:" << endl;
 
-	CARDTOSTR(&buffer[0], context.bot_cards[0]);
-	CARDTOSTR(&buffer[2], context.bot_cards[1]);
-	buffer[4] = 0;
-	os << "bot_cards: " << buffer;
+//	CARDTOSTR(&buffer[0], context.bot_cards[0]);
+//	CARDTOSTR(&buffer[2], context.bot_cards[1]);
+//	buffer[4] = 0;
+//	os << "bot_cards: " << buffer;
 
+	os << "bot_cards: " << context.bot_cards;
+/*
 	CARDTOSTR(&buffer[0], context.common_cards[0]);
 	CARDTOSTR(&buffer[2], context.common_cards[1]);
 	CARDTOSTR(&buffer[4], context.common_cards[2]);
@@ -32,6 +34,13 @@ ostream& operator <<(ostream &os, const TableContext& context)
 	CARDTOSTR(&buffer[8], context.common_cards[4]);
 	buffer[10] = 0;
 	os << " common_cards: " << buffer << " betting_round: " << context.betting_round << endl;
+*/
+	os << " common_cards: " << context.common_cards.flop1 << " " << 
+							   context.common_cards.flop2 << " " << 
+							   context.common_cards.flop3 << " " << 
+							   context.common_cards.turn << " " << 
+							   context.common_cards.river;
+	os << " betting_round: " << context.betting_round << endl;
 
 	os << "common_pot: " << context.common_pot << " context.total_pot: " << context.total_pot << endl;
 	os << "bot_deal_position: " << context.bot_deal_position << " bot_bet_position: " << context.bot_bet_position << endl;
@@ -64,14 +73,13 @@ int TableInformation::UpdateTableContext(TableContext& context)
 	table_context[index].bot_chair = context.bot_chair;
 	table_context[index].dealer_chair = context.dealer_chair;
 
-	table_context[index].bot_cards[0] = context.bot_cards[0];
-	table_context[index].bot_cards[1] = context.bot_cards[1];
+	table_context[index].bot_cards = context.bot_cards;
 
-	table_context[index].common_cards[0] = context.common_cards[0];
-	table_context[index].common_cards[1] = context.common_cards[1];
-	table_context[index].common_cards[2] = context.common_cards[2];
-	table_context[index].common_cards[3] = context.common_cards[3];
-	table_context[index].common_cards[4] = context.common_cards[4];
+	table_context[index].common_cards.flop1 = context.common_cards.flop1;
+	table_context[index].common_cards.flop2 = context.common_cards.flop2;
+	table_context[index].common_cards.flop3 = context.common_cards.flop3;
+	table_context[index].common_cards.turn = context.common_cards.turn;
+	table_context[index].common_cards.river = context.common_cards.river;
 
 	table_context[index].betting_round = context.betting_round;
 

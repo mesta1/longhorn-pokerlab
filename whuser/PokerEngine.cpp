@@ -93,14 +93,14 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 	new_context.bot_chair = mychair;
 	new_context.dealer_chair = (int)(*pget_winholdem_symbol)(mychair,"dealerchair",iserr);
 
-	new_context.bot_cards[0] = state->m_player[mychair].m_cards[0];
-	new_context.bot_cards[1] = state->m_player[mychair].m_cards[1];
+	new_context.bot_cards.SetCard(0, Card(state->m_player[mychair].m_cards[0]));
+	new_context.bot_cards.SetCard(1, Card(state->m_player[mychair].m_cards[1]));
 
-	new_context.common_cards[0] = state->m_cards[0];
-	new_context.common_cards[1] = state->m_cards[1];
-	new_context.common_cards[2] = state->m_cards[2];
-	new_context.common_cards[3] = state->m_cards[3];
-	new_context.common_cards[4] = state->m_cards[4];
+	new_context.common_cards.flop1 = state->m_cards[0];
+	new_context.common_cards.flop2 = state->m_cards[1];
+	new_context.common_cards.flop3 = state->m_cards[2];
+	new_context.common_cards.turn = state->m_cards[3];
+	new_context.common_cards.river = state->m_cards[4];
 
 	new_context.betting_round = (int)(*pget_winholdem_symbol)(mychair,"betround",iserr);
 
@@ -172,8 +172,7 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 		// separate thread (or threads for multicore!) that
 		// runs in parallel and does not slow down our UI or table
 		// scraper.  Only run these calculations if our bot is ready.
-		if (ISVALIDCARD(new_context.bot_cards[0])&&
-			ISVALIDCARD(new_context.bot_cards[1]))
+		if (new_context.bot_cards.IsValid())
 		{
 			if (new_context.betting_round == PREFLOP)
 			{
