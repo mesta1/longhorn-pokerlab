@@ -14,7 +14,7 @@ ostream& operator <<(ostream &os, const Hand& h)
 	return (os);
 }
 
-// Use the subscript operator to retrieve either of our hole cards
+// Use the subscript operator to retrieve either of our hole cards (const)
 Card Hand::operator[](const int index) const
 {
 	if (index < 2)
@@ -22,14 +22,14 @@ Card Hand::operator[](const int index) const
 		// Return a Card class with of the desired card
 		return ToCard(cards[index]);
 	}
-	else return Card();  // kludge (creates blank card)
+	else return Card();  // kludge (returns blank card)
 }
 
 // Constructor for a generic, blank Hand class
 Hand::Hand(void)
 {
-	cards[0] = Card::ERROR;  // kludge
-	cards[1] = Card::ERROR;  // kludge
+	cards[0] = Card::NOCARD;  // kludge
+	cards[1] = Card::NOCARD;  // kludge
 	m_size = 0;
 	hand_value = 0;
 }
@@ -39,7 +39,7 @@ Hand::Hand(const Card& card1, const Card& card2)
 {
 	cards[0] = ToPokerEvalCard(card1);
 	cards[1] = ToPokerEvalCard(card2);
-	m_size = 2;
+	m_size = 0;
 	hand_value = 0;
 }
 
@@ -48,15 +48,25 @@ Hand::~Hand(void)
 {
 }
 
+void Hand::SetCard(const int index, const Card& card)
+{
+	if (index < 2)
+	{
+		cards[index] = ToPokerEvalCard(card);
+		hand_value = 0;
+	}
+}
+
 // Evaluate the best 7 card hand given our hole cards and 5 common_cards
 // TODO: Change this to evalute best 5+ card hand
 // TODO: Change this to store common cards (so we can print it out later)
 int Hand::Evaluate(const CommonCards& common_cards)
 {
     CardMask            eval_cards;
+//	char				buf[256];
 
-	Debug::log(LDEBUG) << "Our hand: " << (*this) << std::endl;
-	Debug::log(LDEBUG) << "Common cards:" << common_cards << std::endl;
+//	Debug::log(LDEBUG) << "Hand: " << (*this) << std::endl;
+//	Debug::log(LDEBUG) << "Common cards: " << common_cards << std::endl;
 
 	// Set a poker-eval card mask with the values of all the cards
 	CardMask_RESET(eval_cards);
@@ -68,12 +78,14 @@ int Hand::Evaluate(const CommonCards& common_cards)
 	CardMask_SET(eval_cards, ToPokerEvalCard(common_cards.turn));
 	CardMask_SET(eval_cards, ToPokerEvalCard(common_cards.river));
 
-	//Debug::log(LDEBUG) << "Mask: " << std::endl; StdDeck_printMask(eval_cards); std::cout << std::endl;
+//	StdDeck_maskToString(eval_cards, buf);
+//	Debug::log(LDEBUG) << "Mask: " << buf << std::endl;
 
 	// Get my handval/pokerval
 	hand_value = Hand_EVAL_N(eval_cards, 7);
 
-	//Debug::log(LDEBUG) << "Hand_EVAL_N: " << std::endl; StdRules_HandVal_print(hand_value); std::cout << std::endl;
+//	StdRules_HandVal_toString(hand_value, buf);
+//	Debug::log(LDEBUG) << "Hand_EVAL_N: " << buf << std::endl << std::endl;
 
 	return hand_value;
 }

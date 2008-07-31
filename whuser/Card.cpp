@@ -23,19 +23,25 @@ Card::Card(int rank, int suit)
 	Set(rank, suit);
 }
 
+// Constructor using an OpenHoldem 8-bit value
+Card::Card(unsigned char card)
+{
+	Set(card);
+}
+
 // Clear the card value
 void Card::Reset(void)
 {
 		card = Card::NOCARD;
 		hash = Card::ERROR;
 }
-/*
+
 // Construct the card from a hash value (0-51)
 Card::Card(int val)
 {
 	Set(val);
 }
-*/
+
 Card& Card::operator=(const Card &rhs) {
 
     // Only do assignment if RHS is a different object from this.
@@ -47,11 +53,24 @@ Card& Card::operator=(const Card &rhs) {
     return *this;
 }
 
-Card& Card::operator=(const unsigned char &rhs) {
+Card& Card::operator=(const unsigned char rhs) {
 
     this->Set(rhs);
 
     return *this;
+}
+
+Card& Card::operator=(const int rhs) {
+
+    this->Set(rhs);
+
+    return *this;
+}
+
+int Card::operator==(const Card& rhs) const
+{
+	if (card == rhs.card) return 1;
+	else return 0;
 }
 
 // Set the value of the card from a rank
@@ -71,7 +90,7 @@ void Card::Set(unsigned char c)
 // Set the card value from a hash value (0-51)
 void Card::Set(int h)
 {
-	if ((h>0) && (h<52))
+	if ((h>=0) && (h<52))
 	{
 		card = _absoluteval_deck[h];
 		hash = h;

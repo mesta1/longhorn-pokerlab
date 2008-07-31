@@ -78,7 +78,7 @@ enum BETTING_ROUND {
 // Use this definition for the maximum number of opponents.  We
 // may want to make this configurable.  Note that this is not
 // the same as the maximum players at a table (which may be 9)
-#define	MAX_OPPONENTS		9
+#define	MAX_PLAYERS		10
 
 #define SET_PTRIPLE(a,b,c,d) {a.fold = b; a.checkcall = c; a.betraise = d;}
 

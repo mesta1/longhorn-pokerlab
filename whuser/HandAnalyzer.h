@@ -6,6 +6,8 @@
 #include "Global.h"
 #include "TableInformation.h"
 #include "OpponentModel.h"
+#include "Hand.h"
+#include "Card.h"
 
 class HandAnalyzer
 {
@@ -22,12 +24,12 @@ protected:
 	int IsHandInList(unsigned char c[2], const char* card_list);
 
 private:
-	inline void DealCardsToOpponent(OpponentModel*, unsigned char*, unsigned char*);
-	inline void DealFlop(unsigned char*, unsigned char*);
-	inline void DealTurn(unsigned char*, unsigned char*);
-	inline void DealRiver(unsigned char*, unsigned char*);
+	inline void DealCardsToOpponent(OpponentModel*, Hand*, unsigned char*);
+	inline void DealFlop(CommonCards*, unsigned char*);
+	inline void DealTurn(CommonCards*, unsigned char*);
+	inline void DealRiver(CommonCards*, unsigned char*);
 	double	CalculateProbabilityOfWinning(TableInformation* table, OpponentModel** players);
-	inline int EvaluateBestSevenCardHand(unsigned char*, unsigned char*);
+	inline int EvaluateBestSevenCardHand(Hand*, const CommonCards&);
 
 	double p_win;
 	double p_lose;
