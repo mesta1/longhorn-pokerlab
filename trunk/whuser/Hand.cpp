@@ -164,3 +164,9 @@ Card Hand::ToCard(int card) const
 
 	return (Card(rank, suit));
 }
+
+int Hand::IsValid() const
+{
+	return ((cards[0]!=Card::NOCARD) && (cards[1]!=Card::NOCARD));
+}
+

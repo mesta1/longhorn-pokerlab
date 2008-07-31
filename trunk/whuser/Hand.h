@@ -15,6 +15,7 @@ public:
 	void SetCard(int, const Card&);
 	void Reset(void);
 	void ToString(char*);
+	int IsValid() const;
 
 	Card operator[](const int) const;
 
