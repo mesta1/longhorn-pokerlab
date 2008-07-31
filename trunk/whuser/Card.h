@@ -31,8 +31,9 @@ class Card
 public:
 	Card(void);
 	Card(int, int);
-	//Card(int);
+	Card(int);
 	Card(char*);
+	Card(unsigned char);
 	~Card(void);
 
 	void Set(int, int);
@@ -52,8 +53,10 @@ public:
 	void FromString(const char*);
 
 	Card& operator=(const Card&);
-	Card& operator=(const unsigned char&);
+	Card& operator=(const unsigned char);
+	Card& operator=(const int);
 
+	int operator==(const Card&) const;
 	/*------------------------------------------------------------
 	Card Values (from OpenHoldem wiki)
 

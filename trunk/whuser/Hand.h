@@ -12,7 +12,7 @@ public:
 	~Hand(void);
 	
 	int Evaluate(const CommonCards&);
-	int AddCard(const Card&);
+	void SetCard(int, const Card&);
 	void Reset(void);
 	void ToString(char*);
 
@@ -24,8 +24,8 @@ private:
 	Card ToCard(int card) const;
 
 	int			cards[2];   // cards are stored in poker-eval format
-	HandVal		hand_value;
-	int			m_size;
+	HandVal		hand_value; // last evaluated hand value (no reason to store this yet)
+	int			m_size;		// UNUSED
 };
 
 ostream& operator <<(ostream&, const Hand&);
