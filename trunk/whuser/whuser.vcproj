@@ -237,6 +237,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HandDistribution.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\LowLimitPostflopAnalyzer.cpp"
 				>
 			</File>
@@ -257,7 +261,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\WeightedHandTable.cpp"
+				RelativePath=".\WeightedDistribution.cpp"
 				>
 			</File>
 			<File
@@ -306,6 +310,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HandDistribution.h"
+				>
+			</File>
+			<File
 				RelativePath=".\LowLimitPostflopAnalyzer.h"
 				>
 			</File>
@@ -330,7 +338,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\WeightedHandTable.h"
+				RelativePath=".\WeightedDistribution.h"
 				>
 			</File>
 			<File
