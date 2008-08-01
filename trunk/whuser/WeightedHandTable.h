@@ -1,3 +1,4 @@
+#if 0
 #pragma once
 
 class WeightedHandTable
@@ -2679,3 +2680,4 @@ for convenience:
 1325	AcAs
 
 */
+#endif

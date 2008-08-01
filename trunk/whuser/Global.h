@@ -82,6 +82,7 @@ enum BETTING_ROUND {
 
 #define SET_PTRIPLE(a,b,c,d) {a.fold = b; a.checkcall = c; a.betraise = d;}
 
+#if 0
 ///////////////////////////////////////////////////////////////
 //
 //	Macros and definitions for our card values.  Every
@@ -188,5 +189,6 @@ static const unsigned char _absoluteval_deck[52] =
 		0xE1, 0xE2, 0xE3, 0xE4		// Ac Ad Ah As
 	};
 */
+#endif
 
 #endif

@@ -4,7 +4,6 @@
 #define _OPPONENTMODEL_H_
 
 #include "Global.h"
-#include "WeightedHandTable.h"
 
 struct PlayerContext {
 
@@ -28,7 +27,7 @@ public:
 	int HasPlayerContextChanged(PlayerContext& player_context);
 	PlayerContext* GetPlayerContext(void);
 
-	void DealRandomHand(unsigned char* cards, unsigned char* card_mask) { weight_table.DealRandomHand(cards, card_mask); }
+//	void DealRandomHand(unsigned char* cards, unsigned char* card_mask) { weight_table.DealRandomHand(cards, card_mask); }
 
 private:
 
@@ -39,7 +38,7 @@ private:
 	// These are not true probabilities (i.e., odds that he actually holds those cards
 	// instead of other cards.
 	// e.g., p_cards[0 - 5...] = [AhAh AhAd AhAc AhAs AdAc AdAs ...]
-	WeightedHandTable weight_table;
+	//WeightedHandTable weight_table;
 
 	// p_holecards
 	// Graph of probabilities that the play holds any two unique holecards. 

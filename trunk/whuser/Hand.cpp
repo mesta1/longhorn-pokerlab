@@ -15,31 +15,29 @@ ostream& operator <<(ostream &os, const Hand& h)
 }
 
 // Use the subscript operator to retrieve either of our hole cards (const)
-Card Hand::operator[](const int index) const
+const Card Hand::operator[](const int index) const
 {
-	if (index < 2)
+	if ((index >= 0) && (index < 2))
 	{
 		// Return a Card class with of the desired card
-		return ToCard(cards[index]);
+		return (cards[index]);
 	}
-	else return Card();  // kludge (returns blank card)
+	else return Card(Card::NOCARD);  // kludge (returns blank card)
 }
 
 // Constructor for a generic, blank Hand class
 Hand::Hand(void)
 {
-	cards[0] = Card::NOCARD;  // kludge
-	cards[1] = Card::NOCARD;  // kludge
-	m_size = 0;
-	hand_value = 0;
+	Reset();
 }
 
 // Constructor for a Hand class initialized with two Cards
 Hand::Hand(const Card& card1, const Card& card2)
 {
-	cards[0] = ToPokerEvalCard(card1);
-	cards[1] = ToPokerEvalCard(card2);
-	m_size = 0;
+	pokereval_cards[0] = ConvertCardToPokerEvalCard(card1);
+	pokereval_cards[1] = ConvertCardToPokerEvalCard(card2);
+	cards[0] = card1;
+	cards[1] = card2;
 	hand_value = 0;
 }
 
@@ -50,17 +48,25 @@ Hand::~Hand(void)
 
 void Hand::SetCard(const int index, const Card& card)
 {
-	if (index < 2)
+	if ((index >= 0) && (index < 2))
 	{
-		cards[index] = ToPokerEvalCard(card);
-		hand_value = 0;
+		if (card.IsValid())
+		{
+			pokereval_cards[index] = ConvertCardToPokerEvalCard(card);
+			cards[index] = card;
+			hand_value = 0;
+		}
+	}
+	else
+	{
+		Debug::log(LERROR) << "Attempted to set card out of bounds in Hand::SetCard()! index=" << index << endl;
 	}
 }
 
 // Evaluate the best 7 card hand given our hole cards and 5 common_cards
 // TODO: Change this to evalute best 5+ card hand
 // TODO: Change this to store common cards (so we can print it out later)
-int Hand::Evaluate(const CommonCards& common_cards)
+unsigned int Hand::Evaluate(const CommonCards& common_cards)
 {
     CardMask            eval_cards;
 //	char				buf[256];
@@ -70,13 +76,13 @@ int Hand::Evaluate(const CommonCards& common_cards)
 
 	// Set a poker-eval card mask with the values of all the cards
 	CardMask_RESET(eval_cards);
-	CardMask_SET(eval_cards, cards[0]); 
-	CardMask_SET(eval_cards, cards[1]); 
-	CardMask_SET(eval_cards, ToPokerEvalCard(common_cards.flop1));
-	CardMask_SET(eval_cards, ToPokerEvalCard(common_cards.flop2));
-	CardMask_SET(eval_cards, ToPokerEvalCard(common_cards.flop3));
-	CardMask_SET(eval_cards, ToPokerEvalCard(common_cards.turn));
-	CardMask_SET(eval_cards, ToPokerEvalCard(common_cards.river));
+	CardMask_SET(eval_cards, pokereval_cards[0]); 
+	CardMask_SET(eval_cards, pokereval_cards[1]); 
+	CardMask_SET(eval_cards, ConvertCardToPokerEvalCard(common_cards.flop1));
+	CardMask_SET(eval_cards, ConvertCardToPokerEvalCard(common_cards.flop2));
+	CardMask_SET(eval_cards, ConvertCardToPokerEvalCard(common_cards.flop3));
+	CardMask_SET(eval_cards, ConvertCardToPokerEvalCard(common_cards.turn));
+	CardMask_SET(eval_cards, ConvertCardToPokerEvalCard(common_cards.river));
 
 //	StdDeck_maskToString(eval_cards, buf);
 //	Debug::log(LDEBUG) << "Mask: " << buf << std::endl;
@@ -93,18 +99,21 @@ int Hand::Evaluate(const CommonCards& common_cards)
 // Reset the class to blank;
 void Hand::Reset(void)
 {
-	m_size = 0;
+	pokereval_cards[0] = 0;
+	pokereval_cards[1] = 0;
+	cards[0] = Card::NOCARD;
+	cards[1] = Card::NOCARD;
 	hand_value = 0;
 }
 
-void Hand::ToString(char* str)
+void Hand::HandValueToString(char* str)
 {
 	HandVal_toString(hand_value, str);
 
 	return;
 }
 
-int	Hand::ToPokerEvalCard(const Card& card) const
+int	Hand::ConvertCardToPokerEvalCard(const Card& card) const
 {
 	int rank, suit;
 
@@ -123,8 +132,8 @@ int	Hand::ToPokerEvalCard(const Card& card) const
 
 	return (StdDeck_MAKE_CARD(rank, suit));
 }
-
-int Hand::ToPokerEvalCard(const unsigned char card) const
+/*
+int Hand::ConvertCardToPokerEvalCard(const unsigned char card) const
 {
 	int rank, suit;
 
@@ -143,9 +152,9 @@ int Hand::ToPokerEvalCard(const unsigned char card) const
 
 	return (StdDeck_MAKE_CARD(rank, suit));
 }
-
+*/
 // Convert our member variable card (poker-eval format) to our own Card class
-Card Hand::ToCard(int card) const
+Card Hand::ConvertPokerEvalCardToCard(int card) const
 {
 	int rank, suit;
 
@@ -167,6 +176,6 @@ Card Hand::ToCard(int card) const
 
 int Hand::IsValid() const
 {
-	return ((cards[0]!=Card::NOCARD) && (cards[1]!=Card::NOCARD));
+	return (cards[0].IsValid() && cards[1].IsValid());
 }
 

@@ -11,22 +11,22 @@ public:
 	Hand(const Card&, const Card&);
 	~Hand(void);
 	
-	int Evaluate(const CommonCards&);
+	unsigned int Evaluate(const CommonCards&);		// Evaluate best 7-card hand
 	void SetCard(int, const Card&);
 	void Reset(void);
-	void ToString(char*);
+	void HandValueToString(char*);
 	int IsValid() const;
 
-	Card operator[](const int) const;
+	const Card operator[](const int) const;
 
 private:
-	int	ToPokerEvalCard(const Card& card) const;
-	int ToPokerEvalCard(const unsigned char card) const;
-	Card ToCard(int card) const;
+	int	ConvertCardToPokerEvalCard(const Card& card) const;
+	//int ConvertCardToPokerEvalCard(const unsigned char card) const;
+	Card ConvertPokerEvalCardToCard(int card) const;
 
-	int			cards[2];   // cards are stored in poker-eval format
+	int			pokereval_cards[2];		// cards stored in poker-eval format
+	Card		cards[2];				// cards stored in Card class
 	HandVal		hand_value; // last evaluated hand value (no reason to store this yet)
-	int			m_size;		// UNUSED
 };
 
 ostream& operator <<(ostream&, const Hand&);
