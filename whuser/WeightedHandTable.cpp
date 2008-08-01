@@ -1,3 +1,4 @@
+#if 0
 #include "Global.h"
 #include "Card.h"
 #include "WeightedHandTable.h"
@@ -156,3 +157,4 @@ void WeightedHandTable::DealRandomHand(unsigned char* cards, unsigned char* card
 
 	return;
 }
+#endif

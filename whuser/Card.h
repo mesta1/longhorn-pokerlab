@@ -7,6 +7,8 @@ using namespace std;
 static const char	_rtoc[17] = "[X23456789TJQKA[";
 static const char	_stoc[17] = "]cdhsxxxxxxxxxx]";
 
+typedef unsigned char	OH_CARD;
+
 // Listing of cards by absolute value.  Use ABSOLUTEVAL(card)
 // to determine corresponding index into this array.
 static const unsigned char _absoluteval_deck[52] = 
