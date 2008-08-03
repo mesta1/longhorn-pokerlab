@@ -99,14 +99,15 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 
 	TableContext*	table_context;
 
-	Debug::log(LDEBUG) << "HandAnalyzer::CalculateProbabilityOfWinning()" << std::endl;
+	Debug::log(LTRACE) << "HandAnalyzer::CalculateProbabilityOfWinning()" << std::endl;
+	Debug::log(LINFO) << "==== CALCULATING PROBABILITY OF WINNING..." << endl;
 	for (i=0; i<52; i++) used_card_counter[i] = 0;
 
 	// Provide initial seed for our random number generator
 	// NOTE: deals repeat
 	srand((unsigned)time(0));
 
-	niterations = 50000;			// for now we'll default our simulation iteration limit at 1000
+	niterations = 10000;			// for now we'll default our simulation iteration limit at 1000
 	win = tie = lose = 0;		// reset our simulation counters to 0
 
 	// Record our starting time to track performance
@@ -121,8 +122,15 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 	common_cards.turn = table_context->common_cards.turn;
 	common_cards.river = table_context->common_cards.river;
 
+	Debug::log(LINFO)	<< " Common cards: " << common_cards.flop1 << " " 
+						<< common_cards.flop2 << " "
+						<< common_cards.flop3 << " "
+						<< common_cards.turn << " " 
+						<< common_cards.river << endl;
+
 	// Retrieve our bot's cards
 	bot_hand = table_context->bot_cards;
+	Debug::log(LINFO) << "Bot Hand: " << bot_hand << endl;
 
 	///////////////////////////////////////////////////////////
 	// MONTE CARLO SIMULATION
@@ -218,16 +226,15 @@ double	HandAnalyzer::CalculateProbabilityOfWinning(TableInformation* table, Oppo
 	QueryPerformanceFrequency(&frequency);
 	performance_time = (double) (counter_end.LowPart - counter_start.LowPart) / (double) frequency.LowPart;
 
-	Debug::log(LDEBUG) << "win: " << win << " tie: " << tie << " lose: " << lose << endl;
-	Debug::log(LDEBUG) << "p_win: " << p_win << " p_tie: " << p_tie << " p_lose: " << p_lose << endl;
-	Debug::log(LDEBUG) << "EQUITY: " << (p_win + (p_tie/2)) << endl;
-	Debug::log(LDEBUG) << "nterations: " << niterations << " time: " << performance_time << endl;
-
+	Debug::log(LINFO) << "p_win: " << p_win << " p_tie: " << p_tie << " p_lose: " << p_lose << endl;
+	Debug::log(LINFO) << "EQUITY: " << (p_win + (p_tie/2)) << endl;
+	Debug::log(LINFO) << "nterations: " << niterations << " time: " << performance_time << endl << endl;
+/*
 	for (i=0; i<13; i++)
 	{
 		Debug::log(LDEBUG) << "2: " << used_card_counter[(i*4)] << " " << used_card_counter[(i*4)+1] << " " << used_card_counter[(i*4)+2] << " " << used_card_counter[(i*4)+3] << " " << endl;
 	}
-
+*/
 	return p_win;
 }
 

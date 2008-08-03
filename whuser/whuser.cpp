@@ -121,7 +121,7 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD ul_reason_for_call, LPVOID lpReserve
 			// log events to a file so that we can analyze the play
 
 			Debug::InitializeDebugConsole();		// Prepare the output console
-			Debug::SetLevel(LDEBUG);				// Define our reporting level (anything above the level is not output)
+			Debug::SetLevel(LINFO);				// Define our reporting level (anything above the level is not output)
 
 			Debug::log(LINFO) << DLL_NAME << std::endl;
 			Debug::log(LINFO) << "Version: " << DLL_VERSION << std::endl;
