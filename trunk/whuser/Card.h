@@ -59,6 +59,8 @@ public:
 	Card& operator=(const int);
 
 	int operator==(const Card&) const;
+	int operator!=(const Card&) const;
+
 	/*------------------------------------------------------------
 	Card Values (from OpenHoldem wiki)
 

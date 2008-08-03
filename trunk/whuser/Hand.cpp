@@ -179,3 +179,33 @@ int Hand::IsValid() const
 	return (cards[0].IsValid() && cards[1].IsValid());
 }
 
+int Hand::IsSuited() const
+{
+	if (IsValid())
+	{
+		if (cards[0].Suit() == cards[1].Suit()) return 1;
+	}
+
+	return 0;
+}
+
+int Hand::IsPocketPair() const
+{
+	if (IsValid())
+	{
+		if (cards[0].Rank() == cards[1].Rank()) return 1;
+	}
+
+	return 0;
+}
+
+// returns gap between cards (i.e., "8c 6h" returns 2)
+int Hand::IsConnector() const
+{
+	if (IsValid())
+	{
+		return abs(cards[0].Rank() - cards[1].Rank());
+	}
+
+	return 0;
+}

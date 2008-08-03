@@ -69,7 +69,7 @@ enum ACTION {
 	BETRAISE
 };
 enum BETTING_ROUND {
-	PREFLOP = 0,
+	PREFLOP = 1,
 	FLOP,
 	TURN,
 	RIVER

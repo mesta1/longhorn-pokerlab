@@ -73,6 +73,12 @@ int Card::operator==(const Card& rhs) const
 	else return 0;
 }
 
+int Card::operator!=(const Card& rhs) const
+{
+	if (card == rhs.card) return 0;
+	else return 1;
+}
+
 // Set the value of the card from a rank
 void Card::Set(int rank, int suit)
 {

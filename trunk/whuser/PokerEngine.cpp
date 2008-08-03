@@ -73,11 +73,12 @@ int PokerEngine::getAction()
 //
 int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state* state)
 {
-	bool iserr;
-	char str[16];
-	TableContext new_context;
-	PlayerContext player_context[10];
-	int	playersplayingbits;
+	bool			iserr;
+	int				safe_to_update;
+	char			str[16];
+	TableContext	new_context;
+	PlayerContext	player_context[10];
+	int				playersplayingbits;
 
 	Debug::log(LDEBUG4) << "PokerEngine::UpdateTableContext(pfgws_t* pget_winholdem_symbol, holdem_state* state)" << std::endl;
 
@@ -86,6 +87,10 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 	//
 	int mychair = (int) (*pget_winholdem_symbol)(0,"userchair",iserr);	// Get the bot chair number and use that when calling the symbol accessor
 																		// NOTE: seems pointless.  May be deprecated in OpenHoldem?	
+
+	state->m_title[63] = 0; // kludge
+	strncpy_s(new_context.table_name, 64, state->m_title, 64);
+	new_context.hand_number = (*pget_winholdem_symbol)(mychair,"handnumber",iserr);
 
 	new_context.common_pot = (*pget_winholdem_symbol)(mychair,"potcommon",iserr);
 	new_context.total_pot = (*pget_winholdem_symbol)(mychair,"pot",iserr);
@@ -143,47 +148,52 @@ int PokerEngine::UpdateTableContext(pfgws_t pget_winholdem_symbol, holdem_state*
 	
 	if (table.HasTableContextChanged(new_context))
 	{
-		Debug::log(LDEBUG) << new_context;
-
 		// Store the table context
-		table.UpdateTableContext(new_context);
+		safe_to_update = table.UpdateTableContext(new_context);
 		
-		// Now tell the opponent model about our new player
-		// information
-		for (int i=0; i < 10; i++)
+		// Has our table class determined that this is an appropriate
+		// change do perform calculations on?
+		if (safe_to_update)
 		{
-			// Update the opponent model if the player context has
-			// changed.
-			if (player[i]->HasPlayerContextChanged(player_context[i]))
-				player[i]->UpdatePlayerContext(player_context[i]);
+			// Tell the opponent model about our new player
+			// information
+			for (int i=0; i < 10; i++)
+			{
+				//TODO:
+				//if (PlayerActedSinceLastChange(i))
+				// Update the opponent model if the player context has
+				// changed.
+				if (player[i]->HasPlayerContextChanged(player_context[i]))
+					player[i]->UpdatePlayerContext(player_context[i]);
+			}
+
+			/////////////////////////////////////////////////////
+			// TODO:  Here we change the analyzer to fit the
+			// current flavor of poker for the given hand.  That
+			// is, if we determine we are now heads up we could
+			// switch to the heads-up analyzer which might have
+			// a Nash-equilibrium optimized solution.
+			// 
+			// if (AreWeHeadsUp()) postflop_analyzer = p_HeadsUpLimitNashEqAnalyzer;
+
+			// Finally, rerun statistical calculations with the latest 
+			// information. We will be able to morph this into a
+			// separate thread (or threads for multicore!) that
+			// runs in parallel and does not slow down our UI or table
+			// scraper.  Only run these calculations if our bot is ready.
+			if (table.IsBotHandConfirmed())
+			{
+				if (new_context.betting_round == PREFLOP)
+				{
+					//preflop_analyzer->RunCalculations(&table, &player[0]);
+				}
+				else
+				{
+					postflop_analyzer->RunCalculations(&table, &player[0]);
+				}
+			}
 		}
 
-		/////////////////////////////////////////////////////
-		// TODO:  Here we change the analyzer to fit the
-		// current flavor of poker for the given hand.  That
-		// is, if we determine we are now heads up we could
-		// switch to the heads-up analyzer which might have
-		// a Nash-equilibrium optimized solution.
-		// 
-		// if (AreWeHeadsUp()) postflop_analyzer = p_HeadsUpLimitNashEqAnalyzer;
-
-		// Finally, rerun statistical calculations with the latest 
-		// information. We will be able to morph this into a
-		// separate thread (or threads for multicore!) that
-		// runs in parallel and does not slow down our UI or table
-		// scraper.  Only run these calculations if our bot is ready.
-		if (new_context.bot_cards.IsValid())
-		{
-			if (new_context.betting_round == PREFLOP)
-			{
-				preflop_analyzer->RunCalculations(&table, &player[0]);
-			}
-			else
-			{
-				postflop_analyzer->RunCalculations(&table, &player[0]);
-			}
-		}
-		
 		// That's all for now.  We'll wait until our PokerEngine is
 		// called again to determine what action to take.
 	}
