@@ -696,6 +696,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\enumord.h"
+				>
+			</File>
+			<File
 				RelativePath=".\include\evx_defs.h"
 				>
 			</File>
